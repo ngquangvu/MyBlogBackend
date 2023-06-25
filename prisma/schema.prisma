@@ -1,0 +1,108 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ======== Model ========
+model User {
+  id             String          @id @default(uuid())
+  firstName      String          @map("first_name")
+  lastName       String          @map("last_name")
+  role           Role            @default(USER)
+
+  posts          Post[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("users")
+}
+
+
+model Profile {
+  id                Int                @id @default(autoincrement())
+  bio               String
+  user              User               @relation(fields: [userId], references: [id])
+  userId            Int                @unique
+}
+
+
+model Post {
+  id                Int                @id @default(autoincrement())
+  author            User?              @relation(fields: [authorId], references: [id])
+  authorId          String?
+  parentId          Int
+  name              String
+  title             String
+  metaTitle         String?
+  slug              String?
+  summary           String?
+  content           String?
+  thumbnail         String?
+  url               String
+
+  categories        Category[]
+  tags              Tag[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("posts")
+}
+
+
+model PostComment {
+  id                Int                @id @default(autoincrement())
+  postId            Int
+  parentId          Int
+  title             String
+  published         Boolean  @default(false)
+  content           String
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("post_comments")
+}
+
+
+model Category {
+  id                Int               @id @default(autoincrement())
+  parentId          Int?
+  title             String
+  metaTitle         String?
+  slug              String?
+  content           String?
+  posts             Post[]
+
+  @@map("categories")
+}
+
+
+model Tag {
+  id                Int               @id @default(autoincrement())
+  title             String
+  metaTitle         String?
+  slug              String?
+  content           String?
+  posts             Post[]
+
+  @@map("tags")
+}
+
+
+enum Role {
+  USER
+  AUTHOR
+  ADMIN
+}
