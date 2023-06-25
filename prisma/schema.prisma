@@ -10,11 +10,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// npx prisma migrate dev
 // ======== Model ========
+
 model User {
   id             String          @id @default(uuid())
   firstName      String          @map("first_name")
   lastName       String          @map("last_name")
+  email          String          @unique
   role           Role            @default(USER)
   password       String
 
@@ -32,15 +35,15 @@ model Post {
   id                Int                @id @default(autoincrement())
   author            User?              @relation(fields: [authorId], references: [id])
   authorId          String?
-  parentId          Int
-  name              String
+  parentId          Int?
   title             String
   metaTitle         String?
   slug              String?
   summary           String?
   content           String?
   thumbnail         String?
-  url               String
+  url               String?
+  published         Boolean
 
   categories        Category[]
   tags              Tag[]
