@@ -14,6 +14,10 @@ module.exports = {
     },
     ignorePatterns: ['.eslintrc.js'],
     rules: {
+        /* typescript-eslint-disable no-implicit-any */
+        /* typescript-eslint: disable no-implicit-any */
+        /* typescript-eslint: disable noImplicitAny */
+        /* typescript-eslint-disable @typescript-eslint/no-implicit-any */
         '@typescript-eslint/interface-name-prefix': 'off',
         '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/explicit-module-boundary-types': 'off',
