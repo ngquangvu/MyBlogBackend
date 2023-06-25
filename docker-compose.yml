@@ -1,0 +1,58 @@
+version: '3.7'
+services:
+  db:
+    image: mysql:8.0
+    volumes:
+      - ./data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_USER: 'myblog'
+      MYSQL_ROOT_PASSWORD: 'myblog'
+      MYSQL_DATABASE: 'my_blog'
+      MYSQL_USER: 'myblog'
+      MYSQL_PASSWORD: 'myblog'
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      # TZ: 'Asia/Bangkok'
+      # command: mysqld --max-connections=1000 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode="ALLOW_INVALID_DATES,ANSI_QUOTES,ERROR_FOR_DIVISION_BY_ZERO,HIGH_NOT_PRECEDENCE,IGNORE_SPACE,NO_AUTO_CREATE_USER,NO_AUTO_VALUE_ON_ZERO,NO_BACKSLASH_ESCAPES,NO_DIR_IN_CREATE,NO_ENGINE_SUBSTITUTION,NO_FIELD_OPTIONS,NO_KEY_OPTIONS,NO_TABLE_OPTIONS,NO_UNSIGNED_SUBTRACTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,ONLY_FULL_GROUP_BY,PIPES_AS_CONCAT,REAL_AS_FLOAT,STRICT_ALL_TABLES,STRICT_TRANS_TABLES,ANSI,TRADITIONAL"
+    ports:
+      - '3306:3306'
+    networks:
+      - 'my_blog'
+
+  phpadmin:
+    depends_on:
+      - db
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - '8080:80'
+    environment:
+      MYSQL_USERNAME: myblog
+      MYSQL_ROOT_USERNAME: myblog
+      MYSQL_ROOT_PASSWORD: myblog
+      PMA_HOST: db
+    networks:
+      - 'my_blog'
+
+  redis:
+    image: 'redis:6'
+    container_name: redis
+    ports:
+      - '6379:6379'
+    networks:
+      - 'my_blog'
+
+  mailhog:
+    image: 'mailhog/mailhog:latest'
+    ports:
+      - '${FORWARD_MAILHOG_PORT:-1025}:1025'
+      - '${FORWARD_MAILHOG_DASHBOARD_PORT:-8025}:8025'
+    networks:
+      - 'my_blog'
+
+networks:
+  my_blog:
+    driver: bridge
+
+volumes:
+  data:
