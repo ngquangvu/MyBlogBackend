@@ -1,3 +1,3 @@
 ## MyBlog Backend
 
-NestJS
+NestJS + Prisma
