@@ -40,10 +40,10 @@ model Post {
   metaTitle         String?
   slug              String?
   summary           String?
-  content           String?
+  content           String
   thumbnail         String?
   url               String?
-  published         Boolean
+  published         Boolean            @default(true)
 
   categories        Category[]
   tags              Tag[]
