@@ -9,9 +9,9 @@ export class UserDTO {
     @IsNotEmpty()
     readonly lastName: string
 
-    // @IsString()
-    // @IsNotEmpty()
-    // readonly email: string
+    @IsString()
+    @IsNotEmpty()
+    readonly email: string
 
     @IsDateString({ strict: true })
     createdAt: Date | ''
