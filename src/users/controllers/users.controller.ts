@@ -2,6 +2,7 @@ import { Controller, Get, Request, Post, Body, Bind, Param, ParseUUIDPipe, Delet
 import { User } from '@prisma/client'
 import { CreateUserDTO, UserDTO, UpdateUserDTO } from '../dtos'
 import { UserService } from '../services/users.service'
+import { log } from 'console'
 
 @Controller('users')
 export class UsersController {
