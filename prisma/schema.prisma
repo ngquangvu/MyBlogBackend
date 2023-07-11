@@ -22,6 +22,7 @@ model User {
   password       String
 
   posts          Post[]
+  post_comments  PostComment[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -33,8 +34,8 @@ model User {
 
 model Post {
   id                Int                @id @default(autoincrement())
-  author            User?              @relation(fields: [authorId], references: [id])
   authorId          String?
+  author            User?              @relation(fields: [authorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   parentId          Int?
   title             String
   metaTitle         String?
@@ -58,14 +59,16 @@ model Post {
 
 
 model PostComment {
-  id                Int                @id @default(autoincrement())
+  id                Int               @id @default(autoincrement())
+  authorId          String?
+  author            User?             @relation(fields: [authorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   postId            Int
+  Post              Post              @relation(fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   parentId          Int
   title             String
-  published         Boolean  @default(false)
+  metaTitle         String?
+  published         Boolean           @default(false)
   content           String
-
-  Post              Post?              @relation(fields: [postId], references: [id]) // A comment can have one post
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
