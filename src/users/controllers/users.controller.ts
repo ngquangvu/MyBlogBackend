@@ -1,8 +1,7 @@
-import { Controller, Get, Request, Post, Body, Bind, Param, ParseUUIDPipe, Delete, Put } from '@nestjs/common'
+import { Controller, Get, Request, Post, Body, Bind, Param, Delete, Put } from '@nestjs/common'
 import { User } from '@prisma/client'
-import { CreateUserDTO, UserDTO, UpdateUserDTO } from '../dtos'
+import { CreateUserDTO, UpdateUserDTO } from '../dtos'
 import { UserService } from '../services/users.service'
-import { log } from 'console'
 
 @Controller('users')
 export class UsersController {
