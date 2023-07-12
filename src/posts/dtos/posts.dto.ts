@@ -15,15 +15,15 @@ export class PostDto implements Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'd
     readonly title: string
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly metaTitle: string
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly slug: string
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly summary: string
 
     @IsString()
@@ -31,14 +31,14 @@ export class PostDto implements Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'd
     readonly content: string
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly thumbnail: string
 
     @IsString()
-    @IsNotEmpty()
+    @IsOptional()
     readonly url: string
 
     @IsBoolean()
-    @IsNotEmpty()
+    @IsOptional()
     readonly published: boolean
 }

@@ -17,7 +17,9 @@ export class PostService {
             content: true,
             thumbnail: true,
             url: true,
-            published: false
+            published: true,
+            createdAt: true,
+            updatedAt: true
         }
     }
 
@@ -25,16 +27,21 @@ export class PostService {
         const post = await this._prismaService.post.findFirst({
             where: {
                 id
-            }
+            },
+            ...this._select
         })
         return post
     }
 
     async findAll() {
-        return this._prismaService.post.findMany({})
+        return this._prismaService.post.findMany({
+            ...this._select
+        })
     }
 
     async create(createData: PostDto) {
+        console.log(createData)
+
         return await this._prismaService.post.create({
             data: {
                 ...createData

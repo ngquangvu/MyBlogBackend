@@ -1,20 +1,16 @@
-import { Role, User } from '@prisma/client'
-import { IsNotEmpty, IsString } from 'class-validator'
+import { IsNotEmpty, IsString, Matches, MaxLength, MinLength } from 'class-validator'
+import { UserDto } from './users.dto'
 
-export class CreateUserDTO implements Omit<User, 'id'> {
-    email: string
-    role: Role
-    password: string
-
+export class CreateUserDto extends UserDto {
     @IsString()
     @IsNotEmpty()
-    firstName: string
-
-    @IsString()
-    @IsNotEmpty()
-    lastName: string
-
-    createdAt: Date
-    updatedAt: Date
-    deletedAt: Date
+    @MinLength(6)
+    @MaxLength(16)
+    @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{6,16}$)/, {
+        message: 'Password requirements has not been reached'
+    })
+    @Matches(/^([a-zA-Z0-9@#\$%&?!]+)$/, {
+        message: 'Special characters can be used'
+    })
+    readonly password: string
 }

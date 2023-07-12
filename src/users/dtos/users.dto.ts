@@ -1,6 +1,7 @@
-import { IsDateString, IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { Role, User } from '@prisma/client'
+import { IsNotEmpty, IsString } from 'class-validator'
 
-export class UserDTO {
+export class UserDto implements Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'password'> {
     @IsString()
     @IsNotEmpty()
     readonly firstName: string
@@ -13,14 +14,6 @@ export class UserDTO {
     @IsNotEmpty()
     readonly email: string
 
-    @IsDateString({ strict: true })
-    createdAt: Date | ''
-
-    @IsOptional()
-    @IsDateString({ strict: true })
-    updatedAt: Date | ''
-
-    @IsOptional()
-    @IsDateString({ strict: true })
-    deletedAt: Date | ''
+    @IsNotEmpty()
+    role: Role
 }

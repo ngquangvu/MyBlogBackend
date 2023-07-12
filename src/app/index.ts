@@ -5,6 +5,7 @@ import { UserModule } from 'src/users'
 import { NODE_ENV } from './constants'
 import { APP_INTERCEPTOR } from '@nestjs/core'
 import { TransformInterceptor } from 'src/common/api/interceptors/transform.interceptor'
+import { PostModule } from 'src/posts'
 
 @Module({
     imports: [
@@ -15,7 +16,8 @@ import { TransformInterceptor } from 'src/common/api/interceptors/transform.inte
             })
         }),
 
-        UserModule
+        UserModule,
+        PostModule
     ],
     providers: [
         {

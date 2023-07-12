@@ -19,7 +19,7 @@ model User {
   lastName       String          @map("last_name")
   email          String          @unique
   role           Role            @default(USER)
-  password       String
+  password       String          @hidden
 
   posts          Post[]
   post_comments  PostComment[]

@@ -10,4 +10,4 @@ import { PostService } from './services'
     controllers: [PostsController],
     exports: [PostService]
 })
-export class UserModule {}
+export class PostModule {}

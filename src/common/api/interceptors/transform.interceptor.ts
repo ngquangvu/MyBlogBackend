@@ -15,9 +15,9 @@ export class TransformInterceptor<T> implements NestInterceptor<T, Response<T>> 
             map((data) => ({
                 statusCode: context.switchToHttp().getResponse().statusCode,
                 timestamp: new Date().toISOString(),
-                message: data.message,
+                message: data !== null ? data.message : 'Not found',
                 data: {
-                    result: data,
+                    result: data !== null ? data : {},
                     meta: {}
                 }
             }))
