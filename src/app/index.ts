@@ -6,6 +6,7 @@ import { NODE_ENV } from './constants'
 import { APP_INTERCEPTOR } from '@nestjs/core'
 import { TransformInterceptor } from 'src/common/api/interceptors/transform.interceptor'
 import { PostModule } from 'src/posts'
+import { AuthModule } from 'src/auth/auth.module'
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import { PostModule } from 'src/posts'
             })
         }),
 
+        AuthModule,
         UserModule,
         PostModule
     ],
