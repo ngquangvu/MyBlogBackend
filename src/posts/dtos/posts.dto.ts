@@ -1,14 +1,14 @@
 import { Post } from '@prisma/client'
-import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 
 export class PostDto implements Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'> {
-    @IsNumber()
+    @IsString()
     @IsNotEmpty()
     readonly authorId: string
 
     @IsString()
     @IsOptional()
-    readonly parentId: number
+    readonly parentId: string
 
     @IsString()
     @IsNotEmpty()

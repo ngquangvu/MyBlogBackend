@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/service/prisma.service'
 import { UpdateUserDto } from '../dtos'
-import { Role } from '@prisma/client'
+import { AuthenticationProvider } from 'src/authentication/providers'
+import { RegisterUserDto } from 'src/authentication/dtos'
 
 @Injectable()
 export class UserService {
@@ -17,13 +18,17 @@ export class UserService {
         }
     }
 
+    async findOneByEmail(email: string) {
+        return this._prismaService.user.findFirst({
+            where: { email: email },
+            ...this._select
+        })
+    }
+
     async findOne(id: string) {
         const user = await this._prismaService.user.findFirst({
             where: {
-                id,
-                NOT: {
-                    role: Role.ADMIN
-                }
+                id
             },
             ...this._select
         })
@@ -33,11 +38,24 @@ export class UserService {
 
     async findAll() {
         return this._prismaService.user.findMany({
-            where: {
-                NOT: {
-                    role: Role.ADMIN
-                }
-            },
+            where: {},
+            ...this._select
+        })
+    }
+
+    async userRegister(registerUserDto: RegisterUserDto) {
+        const user = await this.findOneByEmail(registerUserDto.email)
+        if (user) {
+            throw new BadRequestException(`Email is already taken`)
+        }
+
+        const hashedRegistrationDto = {
+            ...registerUserDto,
+            password: await AuthenticationProvider.generatePassword(registerUserDto.password)
+        }
+
+        return this._prismaService.user.create({
+            data: { ...hashedRegistrationDto },
             ...this._select
         })
     }

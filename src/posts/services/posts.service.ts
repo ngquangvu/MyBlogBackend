@@ -23,7 +23,7 @@ export class PostService {
         }
     }
 
-    async findOne(id: number) {
+    async findOne(id: string) {
         const post = await this._prismaService.post.findFirst({
             where: {
                 id
@@ -50,9 +50,9 @@ export class PostService {
         })
     }
 
-    async update(updateData: PostDto, id: number) {
+    async update(updateData: PostDto, id: string) {
         return await this._prismaService.post.update({
-            where: { id: id },
+            where: { id },
             data: {
                 ...updateData
             },
@@ -60,7 +60,7 @@ export class PostService {
         })
     }
 
-    async delete(id: number) {
+    async delete(id: string) {
         return this._prismaService.post.delete({ where: { id } })
     }
 }

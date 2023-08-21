@@ -1,19 +1,8 @@
-import { Role, User } from '@prisma/client'
-import { IsNotEmpty, IsString } from 'class-validator'
+import { User } from '@prisma/client'
+import { IsEmail, IsNotEmpty } from 'class-validator'
 
-export class UserDto implements Omit<User, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt' | 'password'> {
-    @IsString()
-    @IsNotEmpty()
-    readonly firstName: string
-
-    @IsString()
-    @IsNotEmpty()
-    readonly lastName: string
-
-    @IsString()
+export class UserDto implements Pick<User, 'email'> {
+    @IsEmail()
     @IsNotEmpty()
     readonly email: string
-
-    @IsNotEmpty()
-    role: Role
 }

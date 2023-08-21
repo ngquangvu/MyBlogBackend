@@ -31,12 +31,26 @@ model User {
   @@map("users")
 }
 
+model Admin {
+  id                String            @id @default(uuid())
+  firstName         String?           @map("first_name")
+  lastName          String?           @map("last_name")
+  email             String            @unique
+  password          String
+
+  createdAt         DateTime          @default(now())       @map("created_at")
+  updatedAt         DateTime?         @updatedAt            @map("updated_at")
+  deletedAt         DateTime?         @map("deleted_at")
+
+  @@map("admins")
+}
+
 
 model Post {
-  id                Int                @id @default(autoincrement())
+  id                String             @id @default(uuid())
   authorId          String?
   author            User?              @relation(fields: [authorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  parentId          Int?
+  parentId          String?
   title             String
   metaTitle         String?
   slug              String?
@@ -59,12 +73,12 @@ model Post {
 
 
 model PostComment {
-  id                Int               @id @default(autoincrement())
+  id                String            @id @default(uuid())
   authorId          String?
   author            User?             @relation(fields: [authorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  postId            Int
+  postId            String
   Post              Post              @relation(fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  parentId          Int
+  parentId          String
   title             String
   metaTitle         String?
   published         Boolean           @default(false)
@@ -80,7 +94,7 @@ model PostComment {
 
 model Category {
   id                Int               @id @default(autoincrement())
-  parentId          Int?
+  parentId          String?
   title             String
   metaTitle         String?
   slug              String?
@@ -106,5 +120,4 @@ model Tag {
 enum Role {
   USER
   AUTHOR
-  ADMIN
 }

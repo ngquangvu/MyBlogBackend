@@ -16,7 +16,11 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "migrate": "prisma migrate dev --preview-feature",
+    "seed": "npx prisma db seed",
+    "generate": "npx prisma generate",
+    "studio": "npx prisma studio"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
@@ -32,11 +36,15 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.1.1",
     "@prisma/client": "^4.16.1",
+    "@types/bcrypt": "^5.0.0",
+    "@types/passport-local": "^1.0.35",
+    "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "cookie-parser": "^1.4.6",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1"
   },

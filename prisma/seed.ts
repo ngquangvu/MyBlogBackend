@@ -1,4 +1,6 @@
-import { PrismaClient, User } from '@prisma/client'
+import { Admin, PrismaClient, User } from '@prisma/client'
+import * as bcrypt from 'bcrypt'
+
 const prisma = new PrismaClient()
 
 // npx prisma db seed
@@ -7,6 +9,7 @@ async function truncate(prisma: PrismaClient) {
     await prisma.$queryRaw`SET FOREIGN_KEY_CHECKS=0`
 
     await prisma.$queryRawUnsafe('TRUNCATE TABLE users')
+    await prisma.$queryRawUnsafe('TRUNCATE TABLE admins')
     await prisma.$queryRawUnsafe('TRUNCATE TABLE posts')
     await prisma.$queryRawUnsafe('TRUNCATE TABLE post_comments')
     await prisma.$queryRawUnsafe('TRUNCATE TABLE categories')
@@ -17,20 +20,8 @@ async function truncate(prisma: PrismaClient) {
 
 enum Role {
     USER = 'USER',
-    AUTHOR = 'AUTHOR',
-    ADMIN = 'ADMIN'
+    AUTHOR = 'AUTHOR'
 }
-
-const adminData = [
-    {
-        id: '1',
-        firstName: 'Vu',
-        lastName: 'Nguyen',
-        email: 'email@gmail.com',
-        role: Role.ADMIN,
-        password: '12345678'
-    }
-]
 
 const categoryData = [
     {
@@ -58,11 +49,14 @@ const tagData = [
     }
 ]
 
-const createDefaultAdmin = async () => {
-    adminData.forEach(async (user) => {
-        await prisma.user.create({
-            data: user
-        })
+const createDefaultAdmin = async (): Promise<Admin> => {
+    return await prisma.admin.create({
+        data: {
+            firstName: 'admin',
+            lastName: '',
+            email: 'admin@mail.com',
+            password: await bcrypt.hash('admin', 10)
+        }
     })
 }
 
