@@ -3,11 +3,12 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { UserModule } from 'src/users'
 import { NODE_ENV } from './constants'
-import { APP_INTERCEPTOR } from '@nestjs/core'
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core'
 import { TransformInterceptor } from 'src/common/core/interceptors'
 import { AdminModule } from 'src/admins'
 import { AuthenticationModule } from 'src/authentication'
 import { TokenModule } from 'src/token'
+import { HttpExceptionFilter } from 'src/common/core/httpExceptionFilters/httpExceptionFilters'
 
 @Module({
     imports: [
@@ -34,10 +35,8 @@ import { TokenModule } from 'src/token'
         AdminModule
     ],
     providers: [
-        {
-            provide: APP_INTERCEPTOR,
-            useClass: TransformInterceptor
-        }
+        { provide: APP_FILTER, useClass: HttpExceptionFilter },
+        { provide: APP_INTERCEPTOR, useClass: TransformInterceptor }
     ]
 })
 export class AppModule {}
