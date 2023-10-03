@@ -1,5 +1,8 @@
-import { Admin, PrismaClient, User } from '@prisma/client'
+import { Admin, Post, PrismaClient, User } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
+import { Faker } from '@faker-js/faker'
+import { faker as faker_en } from '@faker-js/faker/locale/en_US'
+import { faker as faker_ja } from '@faker-js/faker/locale/ja'
 
 const prisma = new PrismaClient()
 
@@ -18,6 +21,8 @@ async function truncate(prisma: PrismaClient) {
 
     await prisma.$queryRaw`SET FOREIGN_KEY_CHECKS=1`
 }
+
+const randomArray = (min: number, max: number) => Array(Math.floor(Math.random() * (max - min + 1) + min))
 
 enum Role {
     USER = 'USER',
@@ -77,73 +82,29 @@ const createTags = async () => {
     })
 }
 
-const createUserPost = async () => {
-    await prisma.user.upsert({
-        where: {
-            email: 'author1@mail.com'
-        },
-        update: {},
-        create: {
-            email: 'author1@mail.com',
-            firstName: 'A',
-            lastName: 'Nguyen',
-            role: Role.AUTHOR,
-            password: '12345678',
-            posts: {
-                create: [
-                    {
-                        parentId: null,
-                        title: 'Post title 1',
-                        metaTitle: 'metaTitle1',
-                        slug: 'slug1',
-                        summary: 'Post summary 1',
-                        content: 'Post content 1',
-                        thumbnail: 'thumbnail.png',
-                        url: 'https://example.com/blog/post1',
-                        published: true
-                    },
-                    {
-                        parentId: null,
-                        title: 'Post title 2',
-                        metaTitle: 'metaTitle2',
-                        slug: 'slug2',
-                        summary: 'Post summary 2',
-                        content: 'Post content 2',
-                        thumbnail: 'thumbnail.png',
-                        url: 'https://example.com/blog/post2',
-                        published: true
-                    }
-                ]
-            }
+const createUser = async (): Promise<User> => {
+    return await prisma.user.create({
+        data: {
+            firstName: faker_en.name.firstName(),
+            lastName: faker_en.name.lastName(),
+            email: faker_en.helpers.unique(faker_en.internet.email),
+            password: await bcrypt.hash('12345678', 10)
         }
     })
+}
 
-    await prisma.user.upsert({
-        where: {
-            email: 'author2@mail.com'
-        },
-        update: {},
-        create: {
-            email: 'author2@mail.com',
-            firstName: 'B',
-            lastName: 'Nguyen',
-            role: Role.AUTHOR,
-            password: '12345678',
-            posts: {
-                create: [
-                    {
-                        parentId: null,
-                        title: 'Post title 3',
-                        metaTitle: 'metaTitle3',
-                        slug: 'slug3',
-                        summary: 'Post summary 3',
-                        content: 'Post content 3',
-                        thumbnail: 'thumbnail.png',
-                        url: 'https://example.com/blog/post3',
-                        published: true
-                    }
-                ]
-            }
+const createUserPost = async (user: User): Promise<Post> => {
+    return await prisma.post.create({
+        data: {
+            parentId: user.id,
+            title: faker_en.company.name(),
+            metaTitle: faker_en.company.buzzNoun(),
+            slug: faker_en.company.buzzNoun(),
+            summary: faker_en.lorem.paragraph(1),
+            content: faker_en.lorem.paragraph(2),
+            thumbnail: faker_en.image.url(),
+            url: faker_en.internet.url(),
+            published: true
         }
     })
 }
@@ -157,7 +118,16 @@ async function main() {
 
     await createTags()
 
-    await createUserPost()
+    const users: User[] = []
+    const posts: Post[] = []
+
+    for (const _ of randomArray(10, 10)) {
+        const user = await createUser()
+        users.push(user)
+
+        const post = await createUserPost(user)
+        posts.push(post)
+    }
 }
 main()
     .then(async () => {
