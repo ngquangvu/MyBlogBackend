@@ -8,6 +8,7 @@ const prisma = new PrismaClient()
 async function truncate(prisma: PrismaClient) {
     await prisma.$queryRaw`SET FOREIGN_KEY_CHECKS=0`
 
+    await prisma.$queryRawUnsafe('TRUNCATE TABLE tokens')
     await prisma.$queryRawUnsafe('TRUNCATE TABLE users')
     await prisma.$queryRawUnsafe('TRUNCATE TABLE admins')
     await prisma.$queryRawUnsafe('TRUNCATE TABLE posts')

@@ -19,6 +19,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migrate": "prisma migrate dev --preview-feature",
     "seed": "npx prisma db seed",
+    "seed:admin": "ts-node prisma/seed_admin.ts",
     "generate": "npx prisma generate",
     "studio": "npx prisma studio"
   },
