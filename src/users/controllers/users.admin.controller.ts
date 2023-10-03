@@ -1,7 +1,6 @@
-import { Controller, Request, Post, Body, Bind, UseGuards, Get, Param, Query } from '@nestjs/common'
+import { Controller, Request, Bind, UseGuards, Get, Param, Query } from '@nestjs/common'
 import { UserService } from '../services/users.service'
 import { JwtAdminAuthGuard } from 'src/token/guards'
-import { log } from 'console'
 import { PaginationQueryDto } from 'src/common/dtos'
 
 @Controller('/admin/users')

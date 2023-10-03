@@ -96,7 +96,8 @@ const createUser = async (): Promise<User> => {
 const createUserPost = async (user: User): Promise<Post> => {
     return await prisma.post.create({
         data: {
-            parentId: user.id,
+            authorId: user.id,
+            parentId: null,
             title: faker_en.company.name(),
             metaTitle: faker_en.company.buzzNoun(),
             slug: faker_en.company.buzzNoun(),
