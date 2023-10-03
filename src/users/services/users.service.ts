@@ -3,6 +3,8 @@ import { PrismaService } from 'src/prisma/service/prisma.service'
 import { UpdateUserDto } from '../dtos'
 import { AuthenticationProvider } from 'src/authentication/providers'
 import { RegisterUserDto } from 'src/authentication/dtos'
+import { PaginationQueryDto } from 'src/common/dtos'
+import { Prisma } from '@prisma/client'
 
 @Injectable()
 export class UserService {
@@ -36,11 +38,42 @@ export class UserService {
         return user
     }
 
-    async findAll() {
-        return this._prismaService.user.findMany({
-            where: {},
-            ...this._select
-        })
+    async findAll(userPaginationQuery: PaginationQueryDto) {
+        const { page = 1, limit = 10, search = undefined } = userPaginationQuery
+
+        const or = search
+            ? {
+                  OR: [
+                      { firstName: { contains: search } },
+                      { lastName: { contains: search } },
+                      { email: { contains: search } }
+                  ]
+              }
+            : {}
+
+        const [totalCount, data] = await Promise.all([
+            this._prismaService.user.count({
+                where: {
+                    ...or,
+                    deletedAt: null
+                }
+            }),
+            this._prismaService.user.findMany({
+                skip: (page - 1) * limit,
+                take: limit,
+                where: {
+                    ...or,
+                    deletedAt: null
+                },
+                orderBy: { updatedAt: Prisma.SortOrder.desc },
+                ...this._select
+            })
+        ])
+
+        return {
+            data,
+            totalCount
+        }
     }
 
     async userRegister(registerUserDto: RegisterUserDto) {
