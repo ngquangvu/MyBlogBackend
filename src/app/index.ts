@@ -8,6 +8,7 @@ import { TransformInterceptor } from 'src/common/core/interceptors'
 import { AdminModule } from 'src/admins'
 import { AuthenticationModule } from 'src/authentication'
 import { TokenModule } from 'src/token'
+import { PostModule } from 'src/posts'
 
 @Module({
     imports: [
@@ -25,19 +26,19 @@ import { TokenModule } from 'src/token'
                 JWT_ADMIN_ACCESS_SECRET: Joi.string().required(),
                 JWT_ADMIN_ACCESS_EXPIRATION_TIME: Joi.number().required(),
                 JWT_ADMIN_REFRESH_SECRET: Joi.string().required(),
-                JWT_ADMIN_REFRESH_EXPIRATION_TIME: Joi.number().required()
+                JWT_ADMIN_REFRESH_EXPIRATION_TIME: Joi.number().required(),
+                PAGINATION_LIMIT: Joi.number().required()
             })
         }),
         TokenModule,
         AuthenticationModule,
         UserModule,
-        AdminModule
+        AdminModule,
+        PostModule
     ],
     providers: [
-        {
-            provide: APP_INTERCEPTOR,
-            useClass: TransformInterceptor
-        }
+        // { provide: APP_FILTER, useClass: HttpExceptionFilter },
+        { provide: APP_INTERCEPTOR, useClass: TransformInterceptor }
     ]
 })
 export class AppModule {}

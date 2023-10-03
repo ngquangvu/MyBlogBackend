@@ -19,6 +19,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "migrate": "prisma migrate dev --preview-feature",
     "seed": "npx prisma db seed",
+    "seed:admin": "ts-node prisma/seed_admin.ts",
     "generate": "npx prisma generate",
     "studio": "npx prisma studio"
   },
@@ -49,6 +50,7 @@
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.1.0",
     "@nestjs/cli": "^10.0.1",
     "@nestjs/schematics": "^10.0.1",
     "@nestjs/testing": "^10.0.0",
