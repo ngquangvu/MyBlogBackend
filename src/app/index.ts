@@ -26,7 +26,8 @@ import { HttpExceptionFilter } from 'src/common/core/httpExceptionFilters/httpEx
                 JWT_ADMIN_ACCESS_SECRET: Joi.string().required(),
                 JWT_ADMIN_ACCESS_EXPIRATION_TIME: Joi.number().required(),
                 JWT_ADMIN_REFRESH_SECRET: Joi.string().required(),
-                JWT_ADMIN_REFRESH_EXPIRATION_TIME: Joi.number().required()
+                JWT_ADMIN_REFRESH_EXPIRATION_TIME: Joi.number().required(),
+                PAGINATION_LIMIT: Joi.number().required()
             })
         }),
         TokenModule,

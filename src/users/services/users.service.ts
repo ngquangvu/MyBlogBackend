@@ -5,11 +5,12 @@ import { AuthenticationProvider } from 'src/authentication/providers'
 import { RegisterUserDto } from 'src/authentication/dtos'
 import { PaginationQueryDto } from 'src/common/dtos'
 import { Prisma } from '@prisma/client'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class UserService {
-    constructor(private readonly _prismaService: PrismaService) {}
-
+    constructor(private readonly _prismaService: PrismaService, private readonly _configService: ConfigService) {}
+    private readonly _pageLimit = this._configService.get<number>('PAGINATION_LIMIT')
     private readonly _select = {
         select: {
             id: true,
@@ -39,7 +40,7 @@ export class UserService {
     }
 
     async findAll(userPaginationQuery: PaginationQueryDto) {
-        const { page = 1, limit = 10, search = undefined } = userPaginationQuery
+        const { page = 1, limit = this._pageLimit, search = undefined } = userPaginationQuery
 
         const or = search
             ? {
