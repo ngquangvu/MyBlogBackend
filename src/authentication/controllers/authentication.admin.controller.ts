@@ -29,8 +29,8 @@ export class AuthAdminController {
     @Post('logout')
     @HttpCode(HttpStatus.OK)
     @Bind(Request())
-    async logOut(_, @Res({ passthrough: true }) response: Response) {
-        await this._tokenAdminService.logout(response)
+    async logOut(request: AdminRequest, @Res({ passthrough: true }) response: Response) {
+        await this._tokenAdminService.logout(response, request.user.id)
         return
     }
 }

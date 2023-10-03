@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-// import * as bcrypt from 'bcrypt'
-// import { PrismaService } from 'src/prisma/service'
+import * as bcrypt from 'bcrypt'
+import { PrismaService } from 'src/prisma/service'
 import { ConfigService } from '@nestjs/config'
 import { AccessTokenForCookie, JwtPayload, RefreshTokenForCookie } from '../types'
 import { AuthenticationResponseType } from 'src/authentication/types'
@@ -10,7 +10,7 @@ import { Response } from 'express'
 @Injectable()
 export class TokenAdminService {
     constructor(
-        // private readonly _prismaService: PrismaService,
+        private readonly _prismaService: PrismaService,
         private readonly _jwtService: JwtService,
         private readonly _configService: ConfigService
     ) {}
@@ -31,6 +31,35 @@ export class TokenAdminService {
             issuer: this._configService.get<string>('APP_NAME'),
             audience: this._configService.get<string>('ADMIN_DOMAIN')
         })
+    }
+
+    async hasToken(authenticationId: string): Promise<boolean> {
+        const hashedRefreshToken = await this._prismaService.token.findFirst({
+            where: { authenticationId: authenticationId }
+        })
+
+        return !!hashedRefreshToken
+    }
+
+    private async updateHashedRefreshToken(id: string, refreshToken: string | null): Promise<void> {
+        let hashedRefreshToken: string | null = null
+        if (refreshToken) {
+            hashedRefreshToken = await bcrypt.hash(refreshToken.slice(-72), 10)
+        }
+
+        const hasToken = await this.hasToken(id)
+        if (hasToken) {
+            await this._prismaService.token.update({
+                where: { authenticationId: id },
+                data: {
+                    hashedRefreshToken
+                }
+            })
+        } else {
+            await this._prismaService.token.create({
+                data: { authenticationId: id, hashedRefreshToken }
+            })
+        }
     }
 
     private async getCookieWithJwtAccessToken(
@@ -79,7 +108,7 @@ export class TokenAdminService {
         // const secure = this._configService.get<string>('NODE_ENV') === NODE_ENV.PRODUCTION
         const secure = false
 
-        // await this.updateHashedRefreshToken(authentication.id, refreshTokenCookie.refresh_token)
+        await this.updateHashedRefreshToken(authentication.id, refreshTokenCookie.refresh_token)
         response.cookie('admin_access_token', accessTokenCookie.access_token, { ...accessTokenCookie.options, secure })
         response.cookie('admin_refresh_token', refreshTokenCookie.refresh_token, {
             ...refreshTokenCookie.options,
@@ -87,8 +116,8 @@ export class TokenAdminService {
         })
     }
 
-    async logout(response: Response): Promise<void> {
-        // this.updateHashedRefreshToken(authenticationId, null)
+    async logout(response: Response, authenticationId: string): Promise<void> {
+        this.updateHashedRefreshToken(authenticationId, null)
         response.clearCookie('admin_access_token')
         response.clearCookie('admin_refresh_token')
     }
