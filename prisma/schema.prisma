@@ -22,7 +22,7 @@ model User {
   password       String
 
   posts          Post[]
-  post_comments  PostComment[]
+  post_comments  Comment[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -76,7 +76,7 @@ model Post {
 
   categories        Category[]
   tags              Tag[]
-  comments          PostComment[]
+  comments          Comment[]
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime? @updatedAt @map("updated_at")
@@ -86,7 +86,7 @@ model Post {
 }
 
 
-model PostComment {
+model Comment {
   id                String            @id @default(uuid())
   authorId          String?
   author            User?             @relation(fields: [authorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
@@ -102,7 +102,7 @@ model PostComment {
   updatedAt DateTime? @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  @@map("post_comments")
+  @@map("comments")
 }
 
 

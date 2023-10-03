@@ -11,7 +11,7 @@ async function truncate(prisma: PrismaClient) {
     await prisma.$queryRawUnsafe('TRUNCATE TABLE users')
     await prisma.$queryRawUnsafe('TRUNCATE TABLE admins')
     await prisma.$queryRawUnsafe('TRUNCATE TABLE posts')
-    await prisma.$queryRawUnsafe('TRUNCATE TABLE post_comments')
+    await prisma.$queryRawUnsafe('TRUNCATE TABLE comments')
     await prisma.$queryRawUnsafe('TRUNCATE TABLE categories')
     await prisma.$queryRawUnsafe('TRUNCATE TABLE tags')
 
