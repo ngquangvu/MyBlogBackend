@@ -74,8 +74,8 @@ model Post {
   url               String?
   published         Boolean            @default(true)
 
-  categories        Category[]
-  tags              Tag[]
+  postTags          PostTag[]
+  postCategories    PostCategory[]
   comments          Comment[]
 
   createdAt DateTime  @default(now()) @map("created_at")
@@ -91,7 +91,7 @@ model Comment {
   authorId          String?
   author            User?             @relation(fields: [authorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   postId            String
-  Post              Post              @relation(fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  posts             Post              @relation(fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   parentId          String
   title             String
   metaTitle         String?
@@ -106,6 +106,18 @@ model Comment {
 }
 
 
+model Tag {
+  id                Int               @id @default(autoincrement())
+  title             String
+  metaTitle         String?
+  slug              String?
+  content           String?
+  postTags          PostTag[]
+
+  @@map("tags")
+}
+
+
 model Category {
   id                Int               @id @default(autoincrement())
   parentId          String?
@@ -113,21 +125,33 @@ model Category {
   metaTitle         String?
   slug              String?
   content           String?
-  posts             Post[]
+  postCategoris     PostCategory[]
 
   @@map("categories")
 }
 
 
-model Tag {
+model PostTag {
   id                Int               @id @default(autoincrement())
-  title             String
-  metaTitle         String?
-  slug              String?
-  content           String?
-  posts             Post[]
+  postId            String
+  tagId             Int
 
-  @@map("tags")
+  posts             Post              @relation(fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  tags              Tag               @relation(fields: [tagId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@map("post_tags")
+}
+
+
+model PostCategory {
+  id                Int               @id @default(autoincrement())
+  postId            String
+  categoryId        Int
+
+  posts             Post              @relation(fields: [postId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  categories        Category          @relation(fields: [categoryId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+
+  @@map("post_categories")
 }
 
 

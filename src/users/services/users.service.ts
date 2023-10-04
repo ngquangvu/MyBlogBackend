@@ -17,6 +17,11 @@ export class UserService {
             firstName: true,
             lastName: true,
             email: true,
+            posts: {
+                select: {
+                    id: true
+                }
+            },
             role: true
         }
     }
@@ -107,6 +112,12 @@ export class UserService {
     async delete(id: string) {
         await this.findOne(id)
 
-        return this._prismaService.user.delete({ where: { id }, ...this._select })
+        return this._prismaService.user.update({
+            where: { id },
+            data: {
+                deletedAt: new Date()
+            },
+            ...this._select
+        })
     }
 }

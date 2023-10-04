@@ -9,7 +9,7 @@ export class UpdateUserDto implements Pick<User, 'password' | 'firstName' | 'las
 
     @IsOptional()
     @IsString()
-    @MinLength(6)
+    @MinLength(5)
     @MaxLength(32)
     @Matches(/^([a-zA-Z0-9@#\$%&?!]+)$/, {
         message: 'Special characters cannot be used for password'
