@@ -1,4 +1,4 @@
-import { Admin, Post, PrismaClient, User } from '@prisma/client'
+import { Admin, Category, Post, PrismaClient, Tag, User } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 import { Faker } from '@faker-js/faker'
 import { faker as faker_en } from '@faker-js/faker/locale/en_US'
@@ -16,12 +16,15 @@ async function truncate(prisma: PrismaClient) {
     await prisma.$queryRawUnsafe('TRUNCATE TABLE admins')
     await prisma.$queryRawUnsafe('TRUNCATE TABLE posts')
     await prisma.$queryRawUnsafe('TRUNCATE TABLE comments')
+    await prisma.$queryRawUnsafe('TRUNCATE TABLE post_categories')
+    await prisma.$queryRawUnsafe('TRUNCATE TABLE post_tags')
     await prisma.$queryRawUnsafe('TRUNCATE TABLE categories')
     await prisma.$queryRawUnsafe('TRUNCATE TABLE tags')
 
     await prisma.$queryRaw`SET FOREIGN_KEY_CHECKS=1`
 }
 
+const randomPositiveInteger = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1) + min)
 const randomArray = (min: number, max: number) => Array(Math.floor(Math.random() * (max - min + 1) + min))
 
 enum Role {
@@ -39,6 +42,11 @@ const categoryData = [
         title: 'Cate 2',
         slug: 'slugc2',
         content: 'This is cate 2'
+    },
+    {
+        title: 'Cate 3',
+        slug: 'slugc3',
+        content: 'This is cate 3'
     }
 ]
 
@@ -52,6 +60,11 @@ const tagData = [
         title: 'Tag 2',
         slug: 'slugt2',
         content: 'This is tag 2'
+    },
+    {
+        title: 'Tag 3',
+        slug: 'slugt3',
+        content: 'This is tag 3'
     }
 ]
 
@@ -66,20 +79,28 @@ const createDefaultAdmin = async (): Promise<Admin> => {
     })
 }
 
-const createCategories = async () => {
-    categoryData.forEach(async (cate) => {
-        await prisma.category.create({
-            data: cate
+const createCategories = async (): Promise<Category[]> => {
+    const cates: Category[] = []
+    categoryData.forEach(async (cateItem) => {
+        const cate = await prisma.category.create({
+            data: cateItem
         })
+        cates.push(cate)
     })
+
+    return cates
 }
 
-const createTags = async () => {
-    tagData.forEach(async (tag) => {
-        await prisma.tag.create({
-            data: tag
+const createTags = async (): Promise<Tag[]> => {
+    const tags: Tag[] = []
+    tagData.forEach(async (tagItem) => {
+        const tag = await prisma.tag.create({
+            data: tagItem
         })
+        tags.push(tag)
     })
+
+    return tags
 }
 
 const createUser = async (): Promise<User> => {
@@ -110,25 +131,47 @@ const createUserPost = async (user: User): Promise<Post> => {
     })
 }
 
+const createPostCate = async (post: Post) => {
+    await prisma.postCategory.create({
+        data: {
+            postId: post.id,
+            categoryId: randomPositiveInteger(1, 3)
+        }
+    })
+}
+
+const createPostTag = async (post: Post) => {
+    await prisma.postTag.create({
+        data: {
+            postId: post.id,
+            tagId: randomPositiveInteger(1, 3)
+        }
+    })
+}
+
+const createCateTag = async () => {
+    await createCategories()
+    await createTags()
+}
+
 async function main() {
     await truncate(prisma)
 
     await createDefaultAdmin()
 
-    await createCategories()
-
-    await createTags()
-
     const users: User[] = []
-    const posts: Post[] = []
 
-    for (const _ of randomArray(10, 10)) {
-        const user = await createUser()
-        users.push(user)
+    await createCateTag().then(async () => {
+        for (const _ of randomArray(10, 10)) {
+            const user = await createUser()
+            users.push(user)
 
-        const post = await createUserPost(user)
-        posts.push(post)
-    }
+            const post = await createUserPost(user)
+
+            await createPostCate(post)
+            await createPostTag(post)
+        }
+    })
 }
 main()
     .then(async () => {
