@@ -3,11 +3,11 @@ import { LoginDto } from './login.dto'
 import { Role } from '@prisma/client'
 
 export class RegisterUserDto extends LoginDto {
-    @IsEmail()
+    @IsString()
     @IsNotEmpty()
     readonly firstName: string
 
-    @IsEmail()
+    @IsString()
     @IsNotEmpty()
     readonly lastName: string
 
@@ -17,7 +17,7 @@ export class RegisterUserDto extends LoginDto {
 
     @IsString()
     @IsNotEmpty()
-    @MinLength(6)
+    @MinLength(5)
     @MaxLength(32)
     @Matches(/^([a-zA-Z0-9@#\$%&?!]+)$/, {
         message: 'Special characters cannot be used for password'
