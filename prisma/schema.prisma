@@ -122,6 +122,7 @@ model Category {
   id                Int               @id @default(autoincrement())
   parentId          String?
   title             String
+  image             String?
   metaTitle         String?
   slug              String?
   content           String?

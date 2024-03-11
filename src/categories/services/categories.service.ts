@@ -1,33 +1,27 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/service/prisma.service'
-import { PostDto } from '../dtos'
 import { PaginationQueryDto } from 'src/common/dtos'
 import { Prisma } from '@prisma/client'
+import { CategoryDto } from '../dtos'
 
 @Injectable()
-export class PostService {
+export class CategoriesService {
     constructor(private readonly _prismaService: PrismaService) {}
 
     private readonly _select = {
         select: {
             id: true,
-            authorId: true,
             parentId: true,
             title: true,
             metaTitle: true,
             slug: true,
-            summary: true,
             content: true,
-            thumbnail: true,
-            url: true,
-            published: true,
-            createdAt: true,
-            updatedAt: true
+            image: true
         }
     }
 
-    async findOne(id: string) {
-        const post = await this._prismaService.post.findFirst({
+    async findOne(id: number) {
+        const post = await this._prismaService.category.findFirst({
             where: {
                 id
             },
@@ -50,20 +44,18 @@ export class PostService {
             : {}
 
         const [totalCount, data] = await Promise.all([
-            this._prismaService.post.count({
+            this._prismaService.category.count({
                 where: {
-                    ...or,
-                    deletedAt: null
+                    ...or
                 }
             }),
-            this._prismaService.post.findMany({
+            this._prismaService.category.findMany({
                 skip: (page - 1) * limit,
                 take: limit,
                 where: {
-                    ...or,
-                    deletedAt: null
+                    ...or
                 },
-                orderBy: { updatedAt: Prisma.SortOrder.desc },
+                orderBy: { id: Prisma.SortOrder.desc },
                 ...this._select
             })
         ])
@@ -74,8 +66,8 @@ export class PostService {
         }
     }
 
-    async create(createData: PostDto) {
-        return await this._prismaService.post.create({
+    async create(createData: CategoryDto) {
+        return await this._prismaService.category.create({
             data: {
                 ...createData
             },
@@ -83,8 +75,8 @@ export class PostService {
         })
     }
 
-    async update(updateData: PostDto, id: string) {
-        return await this._prismaService.post.update({
+    async update(updateData: CategoryDto, id: number) {
+        return await this._prismaService.category.update({
             where: { id },
             data: {
                 ...updateData
@@ -93,7 +85,7 @@ export class PostService {
         })
     }
 
-    async delete(id: string) {
-        return this._prismaService.post.delete({ where: { id } })
+    async delete(id: number) {
+        return this._prismaService.category.delete({ where: { id } })
     }
 }

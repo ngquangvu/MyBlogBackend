@@ -36,16 +36,19 @@ const categoryData = [
     {
         title: 'Cate 1',
         slug: 'slugc1',
+        image: 'cate1.svg',
         content: 'This is cate 1'
     },
     {
         title: 'Cate 2',
         slug: 'slugc2',
+        image: 'cate2.svg',
         content: 'This is cate 2'
     },
     {
         title: 'Cate 3',
         slug: 'slugc3',
+        image: 'cate3.svg',
         content: 'This is cate 3'
     }
 ]
