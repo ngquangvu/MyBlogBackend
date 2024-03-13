@@ -134,20 +134,20 @@ const createUserPost = async (user: User): Promise<Post> => {
     })
 }
 
-const createPostCate = async (post: Post) => {
+const createPostCate = async (post: Post, cateId: number) => {
     await prisma.postCategory.create({
         data: {
             postId: post.id,
-            categoryId: randomPositiveInteger(1, 3)
+            categoryId: cateId
         }
     })
 }
 
-const createPostTag = async (post: Post) => {
+const createPostTag = async (post: Post, tagId: number) => {
     await prisma.postTag.create({
         data: {
             postId: post.id,
-            tagId: randomPositiveInteger(1, 3)
+            tagId: tagId
         }
     })
 }
@@ -171,8 +171,17 @@ async function main() {
 
             const post = await createUserPost(user)
 
-            await createPostCate(post)
-            await createPostTag(post)
+            categoryData.forEach(async (_, index) => {
+                if (randomPositiveInteger(1, 2) % 2 === 1) {
+                    await createPostCate(post, index + 1)
+                }
+            })
+
+            tagData.forEach(async (_, index) => {
+                if (randomPositiveInteger(1, 2) % 2 === 1) {
+                    await createPostTag(post, index + 1)
+                }
+            })
         }
     })
 }

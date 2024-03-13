@@ -66,6 +66,15 @@ export class CategoriesService {
         }
     }
 
+    async getAll() {
+        const data = await this._prismaService.category.findMany({
+            orderBy: { id: Prisma.SortOrder.asc },
+            ...this._select
+        })
+
+        return data
+    }
+
     async create(createData: CategoryDto) {
         return await this._prismaService.category.create({
             data: {

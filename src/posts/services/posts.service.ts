@@ -3,10 +3,11 @@ import { PrismaService } from 'src/prisma/service/prisma.service'
 import { PostDto } from '../dtos'
 import { PaginationQueryDto } from 'src/common/dtos'
 import { Prisma } from '@prisma/client'
+import { CategoriesService } from 'src/categories/services'
 
 @Injectable()
 export class PostService {
-    constructor(private readonly _prismaService: PrismaService) {}
+    constructor(private readonly _prismaService: PrismaService, private readonly _cateService: CategoriesService) {}
 
     private readonly _select = {
         select: {
@@ -21,6 +22,18 @@ export class PostService {
             thumbnail: true,
             url: true,
             published: true,
+            postTags: {
+                select: {
+                    tagId: true
+                }
+            },
+            postCategories: {
+                select: {
+                    categoryId: true
+                }
+            },
+            comments: true,
+
             createdAt: true,
             updatedAt: true
         }
@@ -68,8 +81,17 @@ export class PostService {
             })
         ])
 
+        const categories = await this._cateService.getAll()
+
         return {
-            data,
+            data: data.map((post) => {
+                return {
+                    ...post,
+                    postCategories: categories.filter((allCate) =>
+                        post.postCategories.find((postCate) => postCate.categoryId === allCate.id)
+                    )
+                }
+            }),
             totalCount
         }
     }
