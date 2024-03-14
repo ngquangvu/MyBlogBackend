@@ -46,7 +46,15 @@ export class PostService {
             },
             ...this._select
         })
-        return post
+
+        const categories = await this._cateService.getAll()
+
+        return {
+            ...post,
+            postCategories: categories.filter((allCate) =>
+                post.postCategories.find((postCate) => postCate.categoryId === allCate.id)
+            )
+        }
     }
 
     async findAll(postPaginationQuery: PostPaginationQueryDto) {
@@ -69,8 +77,8 @@ export class PostService {
                 where: {
                     ...or,
                     postCategories: {
-                        every: {
-                            categoryId: cateObj ? cateObj.id : 0
+                        some: {
+                            categoryId: cateObj ? cateObj.id : undefined
                         }
                     },
                     deletedAt: null
@@ -82,8 +90,8 @@ export class PostService {
                 where: {
                     ...or,
                     postCategories: {
-                        every: {
-                            categoryId: cateObj ? cateObj.id : 0
+                        some: {
+                            categoryId: cateObj ? cateObj.id : undefined
                         }
                     },
                     deletedAt: null
