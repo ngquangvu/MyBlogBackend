@@ -126,7 +126,7 @@ model Category {
   metaTitle         String?
   slug              String?
   content           String?
-  postCategoris     PostCategory[]
+  postCategories     PostCategory[]
 
   @@map("categories")
 }

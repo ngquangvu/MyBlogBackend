@@ -30,6 +30,16 @@ export class CategoriesService {
         return post
     }
 
+    async findSlug(slug: string) {
+        const post = await this._prismaService.category.findFirst({
+            where: {
+                slug
+            },
+            ...this._select
+        })
+        return post
+    }
+
     async findAll(postPaginationQuery: PaginationQueryDto) {
         const { page = 1, limit = 10, search = undefined } = postPaginationQuery
 

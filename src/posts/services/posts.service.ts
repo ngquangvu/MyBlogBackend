@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/service/prisma.service'
 import { PostDto } from '../dtos'
-import { PaginationQueryDto } from 'src/common/dtos'
 import { Prisma } from '@prisma/client'
 import { CategoriesService } from 'src/categories/services'
+import { PostPaginationQueryDto } from 'src/common/dtos/post-pagination-query.dto'
 
 @Injectable()
 export class PostService {
@@ -49,8 +49,8 @@ export class PostService {
         return post
     }
 
-    async findAll(postPaginationQuery: PaginationQueryDto) {
-        const { page = 1, limit = 10, search = undefined } = postPaginationQuery
+    async findAll(postPaginationQuery: PostPaginationQueryDto) {
+        const { page = 1, limit = 10, search = undefined, cate = '', tag = '' } = postPaginationQuery
 
         const or = search
             ? {
@@ -62,10 +62,17 @@ export class PostService {
               }
             : {}
 
+        const cateObj = await this._cateService.findSlug(cate)
+
         const [totalCount, data] = await Promise.all([
             this._prismaService.post.count({
                 where: {
                     ...or,
+                    postCategories: {
+                        every: {
+                            categoryId: cateObj ? cateObj.id : 0
+                        }
+                    },
                     deletedAt: null
                 }
             }),
@@ -74,6 +81,11 @@ export class PostService {
                 take: limit,
                 where: {
                     ...or,
+                    postCategories: {
+                        every: {
+                            categoryId: cateObj ? cateObj.id : 0
+                        }
+                    },
                     deletedAt: null
                 },
                 orderBy: { updatedAt: Prisma.SortOrder.desc },

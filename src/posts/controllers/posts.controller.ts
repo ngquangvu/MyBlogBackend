@@ -1,8 +1,8 @@
 import { Controller, Get, Request, Post, Body, Bind, Param, Delete, UseGuards, Query } from '@nestjs/common'
 import { PostService } from '../services'
 import { PostDto } from '../dtos'
-import { PaginationQueryDto } from 'src/common/dtos'
 import { JwtAdminAuthGuard } from 'src/token/guards'
+import { PostPaginationQueryDto } from 'src/common/dtos/post-pagination-query.dto'
 
 @Controller('posts')
 export class PostsController {
@@ -15,7 +15,7 @@ export class PostsController {
     }
 
     @Get()
-    async findAll(@Query() postPaginationQuery: PaginationQueryDto) {
+    async findAll(@Query() postPaginationQuery: PostPaginationQueryDto) {
         return await this._postService.findAll(postPaginationQuery)
     }
 
