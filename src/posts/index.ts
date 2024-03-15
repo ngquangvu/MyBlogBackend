@@ -3,10 +3,10 @@ import { ConfigModule } from '@nestjs/config'
 import { PrismaModule } from 'src/prisma'
 import { PostsController } from './controllers'
 import { PostService } from './services'
-import { CategoryModule } from 'src/categories'
+import { TagModule } from 'src/tags'
 
 @Module({
-    imports: [PrismaModule, ConfigModule, CategoryModule],
+    imports: [PrismaModule, ConfigModule, TagModule],
     providers: [PostService],
     controllers: [PostsController],
     exports: [PostService]

@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/service/prisma.service'
 import { PostDto } from '../dtos'
 import { Prisma } from '@prisma/client'
-import { CategoriesService } from 'src/categories/services'
 import { PostPaginationQueryDto } from 'src/common/dtos/post-pagination-query.dto'
+import { TagsService } from 'src/tags/services'
 
 @Injectable()
 export class PostService {
-    constructor(private readonly _prismaService: PrismaService, private readonly _cateService: CategoriesService) {}
+    constructor(private readonly _prismaService: PrismaService, private readonly _tagService: TagsService) {}
 
     private readonly _select = {
         select: {
@@ -47,13 +47,11 @@ export class PostService {
             ...this._select
         })
 
-        const categories = await this._cateService.getAll()
+        const tags = await this._tagService.getAll()
 
         return {
             ...post,
-            postCategories: categories.filter((allCate) =>
-                post.postCategories.find((postCate) => postCate.categoryId === allCate.id)
-            )
+            postTags: tags.filter((allTag) => post.postTags.find((postTag) => postTag.tagId === allTag.id))
         }
     }
 
@@ -70,15 +68,15 @@ export class PostService {
               }
             : {}
 
-        const cateObj = await this._cateService.findSlug(cate)
+        const tagObj = await this._tagService.findSlug(tag)
 
         const [totalCount, data] = await Promise.all([
             this._prismaService.post.count({
                 where: {
                     ...or,
-                    postCategories: {
+                    postTags: {
                         some: {
-                            categoryId: cateObj ? cateObj.id : undefined
+                            tagId: tagObj ? tagObj.id : tag === '' ? undefined : 0
                         }
                     },
                     deletedAt: null
@@ -89,9 +87,9 @@ export class PostService {
                 take: limit,
                 where: {
                     ...or,
-                    postCategories: {
+                    postTags: {
                         some: {
-                            categoryId: cateObj ? cateObj.id : undefined
+                            tagId: tagObj ? tagObj.id : tag === '' ? undefined : 0
                         }
                     },
                     deletedAt: null
@@ -101,14 +99,14 @@ export class PostService {
             })
         ])
 
-        const categories = await this._cateService.getAll()
+        const categories = await this._tagService.getAll()
 
         return {
             data: data.map((post) => {
                 return {
                     ...post,
-                    postCategories: categories.filter((allCate) =>
-                        post.postCategories.find((postCate) => postCate.categoryId === allCate.id)
+                    postTags: categories.filter((allTag) =>
+                        post.postTags.find((postTag) => postTag.tagId === allTag.id)
                     )
                 }
             }),

@@ -21,27 +21,27 @@ export class CategoriesService {
     }
 
     async findOne(id: number) {
-        const post = await this._prismaService.category.findFirst({
+        const cate = await this._prismaService.category.findFirst({
             where: {
                 id
             },
             ...this._select
         })
-        return post
+        return cate
     }
 
     async findSlug(slug: string) {
-        const post = await this._prismaService.category.findFirst({
+        const cate = await this._prismaService.category.findFirst({
             where: {
                 slug
             },
             ...this._select
         })
-        return post
+        return cate
     }
 
-    async findAll(postPaginationQuery: PaginationQueryDto) {
-        const { page = 1, limit = 10, search = undefined } = postPaginationQuery
+    async findAll(paginationQuery: PaginationQueryDto) {
+        const { page = 1, limit = 10, search = undefined } = paginationQuery
 
         const or = search
             ? {
