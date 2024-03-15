@@ -10,6 +10,7 @@ import { AuthenticationModule } from 'src/authentication'
 import { TokenModule } from 'src/token'
 import { PostModule } from 'src/posts'
 import { CategoryModule } from 'src/categories'
+import { TagModule } from 'src/tags'
 
 @Module({
     imports: [
@@ -36,7 +37,8 @@ import { CategoryModule } from 'src/categories'
         UserModule,
         AdminModule,
         PostModule,
-        CategoryModule
+        CategoryModule,
+        TagModule
     ],
     providers: [
         // { provide: APP_FILTER, useClass: HttpExceptionFilter },

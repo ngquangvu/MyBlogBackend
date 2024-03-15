@@ -57,16 +57,19 @@ const tagData = [
     {
         title: 'Tag 1',
         slug: 'slugt1',
+        image: 'tag1.svg',
         content: 'This is tag 1'
     },
     {
         title: 'Tag 2',
         slug: 'slugt2',
+        image: 'tag2.svg',
         content: 'This is tag 2'
     },
     {
         title: 'Tag 3',
         slug: 'slugt3',
+        image: 'tag3.svg',
         content: 'This is tag 3'
     }
 ]

@@ -109,10 +109,15 @@ model Comment {
 model Tag {
   id                Int               @id @default(autoincrement())
   title             String
+  image             String?
   metaTitle         String?
   slug              String?
   content           String?
   postTags          PostTag[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@map("tags")
 }
@@ -127,6 +132,10 @@ model Category {
   slug              String?
   content           String?
   postCategories     PostCategory[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@map("categories")
 }

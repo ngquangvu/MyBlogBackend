@@ -1,11 +1,7 @@
-import { Category } from '@prisma/client'
+import { Tag } from '@prisma/client'
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator'
 
-export class CategoryDto implements Omit<Category, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'> {
-    @IsString()
-    @IsOptional()
-    readonly parentId: string
-
+export class TagDto implements Omit<Tag, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'> {
     @IsString()
     @IsNotEmpty()
     readonly title: string

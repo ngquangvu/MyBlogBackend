@@ -2,16 +2,15 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/service/prisma.service'
 import { PaginationQueryDto } from 'src/common/dtos'
 import { Prisma } from '@prisma/client'
-import { CategoryDto } from '../dtos'
+import { TagDto } from '../dtos'
 
 @Injectable()
-export class CategoriesService {
+export class TagsService {
     constructor(private readonly _prismaService: PrismaService) {}
 
     private readonly _select = {
         select: {
             id: true,
-            parentId: true,
             title: true,
             metaTitle: true,
             slug: true,
@@ -21,7 +20,7 @@ export class CategoriesService {
     }
 
     async findOne(id: number) {
-        const post = await this._prismaService.category.findFirst({
+        const post = await this._prismaService.tag.findFirst({
             where: {
                 id
             },
@@ -31,7 +30,7 @@ export class CategoriesService {
     }
 
     async findSlug(slug: string) {
-        const post = await this._prismaService.category.findFirst({
+        const post = await this._prismaService.tag.findFirst({
             where: {
                 slug
             },
@@ -54,12 +53,12 @@ export class CategoriesService {
             : {}
 
         const [totalCount, data] = await Promise.all([
-            this._prismaService.category.count({
+            this._prismaService.tag.count({
                 where: {
                     ...or
                 }
             }),
-            this._prismaService.category.findMany({
+            this._prismaService.tag.findMany({
                 skip: (page - 1) * limit,
                 take: limit,
                 where: {
@@ -77,7 +76,7 @@ export class CategoriesService {
     }
 
     async getAll() {
-        const data = await this._prismaService.category.findMany({
+        const data = await this._prismaService.tag.findMany({
             orderBy: { id: Prisma.SortOrder.asc },
             ...this._select
         })
@@ -85,8 +84,8 @@ export class CategoriesService {
         return data
     }
 
-    async create(createData: CategoryDto) {
-        return await this._prismaService.category.create({
+    async create(createData: TagDto) {
+        return await this._prismaService.tag.create({
             data: {
                 ...createData
             },
@@ -94,8 +93,8 @@ export class CategoriesService {
         })
     }
 
-    async update(updateData: CategoryDto, id: number) {
-        return await this._prismaService.category.update({
+    async update(updateData: TagDto, id: number) {
+        return await this._prismaService.tag.update({
             where: { id },
             data: {
                 ...updateData
@@ -105,7 +104,7 @@ export class CategoriesService {
     }
 
     async delete(id: number) {
-        return this._prismaService.category.update({
+        return this._prismaService.tag.update({
             data: {
                 deletedAt: new Date()
             },
