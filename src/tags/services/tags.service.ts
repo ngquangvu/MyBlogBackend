@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/service/prisma.service'
 import { PaginationQueryDto } from 'src/common/dtos'
 import { Prisma } from '@prisma/client'
 import { TagDto } from '../dtos'
+import { UpdateTagDto } from '../dtos/update-tag.dto'
 
 @Injectable()
 export class TagsService {
@@ -16,6 +17,21 @@ export class TagsService {
             slug: true,
             content: true,
             image: true
+        }
+    }
+
+    private readonly _selectAdmin = {
+        select: {
+            id: true,
+            title: true,
+            metaTitle: true,
+            slug: true,
+            content: true,
+            image: true,
+
+            createdAt: true,
+            updatedAt: true,
+            deleteAt: true
         }
     }
 
@@ -39,7 +55,7 @@ export class TagsService {
         return tag
     }
 
-    async findAll(paginationQuery: PaginationQueryDto) {
+    async findAll(paginationQuery: PaginationQueryDto, byAdmin = false) {
         const { page = 1, limit = 10, search = undefined } = paginationQuery
 
         const or = search
@@ -65,7 +81,7 @@ export class TagsService {
                     ...or
                 },
                 orderBy: { id: Prisma.SortOrder.desc },
-                ...this._select
+                select: byAdmin ? this._selectAdmin.select : this._select.select
             })
         ])
 
@@ -93,7 +109,7 @@ export class TagsService {
         })
     }
 
-    async update(updateData: TagDto, id: number) {
+    async update(id: number, updateData: UpdateTagDto) {
         return await this._prismaService.tag.update({
             where: { id },
             data: {

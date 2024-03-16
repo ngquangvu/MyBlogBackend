@@ -1,18 +1,10 @@
-import { Controller, Get, Request, Post, Body, Bind, Param, Delete, UseGuards, Query } from '@nestjs/common'
+import { Controller, Get, Param, Query } from '@nestjs/common'
 import { PaginationQueryDto } from 'src/common/dtos'
-import { JwtAdminAuthGuard } from 'src/token/guards'
 import { TagsService } from '../services'
-import { TagDto } from '../dtos'
 
-@Controller('tags')
+@Controller('admin/tags')
 export class TagsController {
     constructor(private readonly _tagService: TagsService) {}
-
-    @Post()
-    @Bind(Request())
-    async create(@Body() createTag: TagDto) {
-        return await this._tagService.create(createTag)
-    }
 
     @Get()
     async findAll(@Query() tagPaginationQuery: PaginationQueryDto) {
@@ -22,11 +14,5 @@ export class TagsController {
     @Get(':id')
     async findById(@Param('id') id: number) {
         return await this._tagService.findOne(id)
-    }
-
-    @Delete(':id')
-    @UseGuards(JwtAdminAuthGuard)
-    async delete(@Param('id') id: number) {
-        return await this._tagService.delete(id)
     }
 }

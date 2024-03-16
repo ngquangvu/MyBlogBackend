@@ -1,1 +1,1 @@
-export * from './tags.controller'
+export * from './tags.admin.controller'
