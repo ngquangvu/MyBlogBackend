@@ -8,12 +8,6 @@ import { CategoryDto } from '../dtos'
 export class CategoriesController {
     constructor(private readonly _cateService: CategoriesService) {}
 
-    @Post()
-    @Bind(Request())
-    async create(@Body() createCate: CategoryDto) {
-        return await this._cateService.create(createCate)
-    }
-
     @Get()
     async findAll(@Query() catePaginationQuery: PaginationQueryDto) {
         return await this._cateService.findAll(catePaginationQuery)
@@ -22,11 +16,5 @@ export class CategoriesController {
     @Get(':id')
     async findById(@Param('id') id: number) {
         return await this._cateService.findOne(id)
-    }
-
-    @Delete(':id')
-    @UseGuards(JwtAdminAuthGuard)
-    async delete(@Param('id') id: number) {
-        return await this._cateService.delete(id)
     }
 }

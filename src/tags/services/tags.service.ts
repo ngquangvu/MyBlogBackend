@@ -31,7 +31,7 @@ export class TagsService {
 
             createdAt: true,
             updatedAt: true,
-            deleteAt: true
+            deletedAt: true
         }
     }
 

@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/service/prisma.service'
 import { PaginationQueryDto } from 'src/common/dtos'
 import { Prisma } from '@prisma/client'
 import { CategoryDto } from '../dtos'
+import { UpdateCategoryDto } from '../dtos/update-category.dto'
 
 @Injectable()
 export class CategoriesService {
@@ -17,6 +18,22 @@ export class CategoriesService {
             slug: true,
             content: true,
             image: true
+        }
+    }
+
+    private readonly _selectAdmin = {
+        select: {
+            id: true,
+            parentId: true,
+            title: true,
+            metaTitle: true,
+            slug: true,
+            content: true,
+            image: true,
+
+            createdAt: true,
+            updatedAt: true,
+            deletedAt: true
         }
     }
 
@@ -40,7 +57,7 @@ export class CategoriesService {
         return cate
     }
 
-    async findAll(paginationQuery: PaginationQueryDto) {
+    async findAll(paginationQuery: PaginationQueryDto, byAdmin = false) {
         const { page = 1, limit = 10, search = undefined } = paginationQuery
 
         const or = search
@@ -66,7 +83,7 @@ export class CategoriesService {
                     ...or
                 },
                 orderBy: { id: Prisma.SortOrder.desc },
-                ...this._select
+                select: byAdmin ? this._selectAdmin.select : this._select.select
             })
         ])
 
@@ -94,7 +111,7 @@ export class CategoriesService {
         })
     }
 
-    async update(updateData: CategoryDto, id: number) {
+    async update(id: number, updateData: UpdateCategoryDto) {
         return await this._prismaService.category.update({
             where: { id },
             data: {
