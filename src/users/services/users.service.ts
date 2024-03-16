@@ -26,6 +26,25 @@ export class UserService {
         }
     }
 
+    private readonly _selectAdmin = {
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            posts: {
+                select: {
+                    id: true
+                }
+            },
+            role: true,
+
+            createdAt: true,
+            updatedAt: true,
+            deletedAt: true
+        }
+    }
+
     async findOneByEmail(email: string) {
         return this._prismaService.user.findFirst({
             where: { email: email },
@@ -44,7 +63,7 @@ export class UserService {
         return user
     }
 
-    async findAll(userPaginationQuery: PaginationQueryDto) {
+    async findAll(userPaginationQuery: PaginationQueryDto, byAdmin = false) {
         const { page = 1, limit = this._pageLimit, search = undefined } = userPaginationQuery
 
         const or = search
@@ -60,19 +79,17 @@ export class UserService {
         const [totalCount, data] = await Promise.all([
             this._prismaService.user.count({
                 where: {
-                    ...or,
-                    deletedAt: null
+                    ...or
                 }
             }),
             this._prismaService.user.findMany({
                 skip: (page - 1) * limit,
                 take: limit,
                 where: {
-                    ...or,
-                    deletedAt: null
+                    ...or
                 },
-                orderBy: { updatedAt: Prisma.SortOrder.desc },
-                ...this._select
+                orderBy: { createdAt: Prisma.SortOrder.desc },
+                select: byAdmin ? this._selectAdmin.select : this._select.select
             })
         ])
 
@@ -118,6 +135,15 @@ export class UserService {
                 deletedAt: new Date()
             },
             ...this._select
+        })
+    }
+
+    async restore(id: string) {
+        return this._prismaService.user.update({
+            data: {
+                deletedAt: null
+            },
+            where: { id }
         })
     }
 }

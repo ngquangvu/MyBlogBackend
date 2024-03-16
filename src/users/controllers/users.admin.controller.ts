@@ -25,7 +25,7 @@ export class AdminUsersController {
     @Get()
     @Bind(Request())
     async getUsers(@Query() userPaginationQuery: PaginationQueryDto) {
-        return await this._userService.findAll(userPaginationQuery)
+        return await this._userService.findAll(userPaginationQuery, true)
     }
 
     @Get(':id')
@@ -38,5 +38,11 @@ export class AdminUsersController {
     @Bind(Request())
     delete(@Param('id') id: string) {
         return this._userService.delete(id)
+    }
+
+    @Patch('/restore/:id')
+    @Bind(Request())
+    async restore(@Param('id') id: string) {
+        return await this._userService.restore(id)
     }
 }
