@@ -127,4 +127,13 @@ export class TagsService {
             where: { id }
         })
     }
+
+    async restore(id: number) {
+        return this._prismaService.tag.update({
+            data: {
+                deletedAt: null
+            },
+            where: { id }
+        })
+    }
 }

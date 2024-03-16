@@ -129,4 +129,13 @@ export class CategoriesService {
             where: { id }
         })
     }
+
+    async restore(id: number) {
+        return this._prismaService.category.update({
+            data: {
+                deletedAt: null
+            },
+            where: { id }
+        })
+    }
 }

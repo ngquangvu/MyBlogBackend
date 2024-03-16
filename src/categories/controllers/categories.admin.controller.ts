@@ -33,8 +33,13 @@ export class CategoriesAdminController {
     }
 
     @Delete(':id')
-    @UseGuards(JwtAdminAuthGuard)
     async delete(@Param('id') id: number) {
         return await this._cateService.delete(id)
+    }
+
+    @Patch('/restore/:id')
+    @Bind(Request())
+    async restore(@Param('id') id: number) {
+        return await this._cateService.restore(id)
     }
 }

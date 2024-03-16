@@ -2,7 +2,7 @@ import { Controller, Get, Param, Query } from '@nestjs/common'
 import { PaginationQueryDto } from 'src/common/dtos'
 import { TagsService } from '../services'
 
-@Controller('admin/tags')
+@Controller('tags')
 export class TagsController {
     constructor(private readonly _tagService: TagsService) {}
 

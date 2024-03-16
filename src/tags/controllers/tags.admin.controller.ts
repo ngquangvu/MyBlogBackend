@@ -37,4 +37,10 @@ export class TagsAdminController {
     async delete(@Param('id') id: number) {
         return await this._tagService.delete(id)
     }
+
+    @Patch('/restore/:id')
+    @Bind(Request())
+    async restore(@Param('id') id: number) {
+        return await this._tagService.restore(id)
+    }
 }
