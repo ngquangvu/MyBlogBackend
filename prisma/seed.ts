@@ -124,14 +124,12 @@ const createUserPost = async (user: User): Promise<Post> => {
     return await prisma.post.create({
         data: {
             authorId: user.id,
-            parentId: null,
             title: faker_en.company.name(),
             metaTitle: faker_en.company.buzzNoun(),
             slug: faker_en.company.buzzNoun(),
             summary: faker_en.lorem.paragraph(1),
             content: faker_en.lorem.paragraph(2),
             thumbnail: faker_en.image.url(),
-            url: faker_en.internet.url(),
             published: true
         }
     })

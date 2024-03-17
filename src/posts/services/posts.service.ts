@@ -13,14 +13,12 @@ export class PostService {
         select: {
             id: true,
             authorId: true,
-            parentId: true,
             title: true,
             metaTitle: true,
             slug: true,
             summary: true,
             content: true,
             thumbnail: true,
-            url: true,
             published: true,
             postTags: {
                 select: {
@@ -43,14 +41,12 @@ export class PostService {
         select: {
             id: true,
             authorId: true,
-            parentId: true,
             title: true,
             metaTitle: true,
             slug: true,
             summary: true,
             content: true,
             thumbnail: true,
-            url: true,
             published: true,
             postTags: {
                 select: {
@@ -110,7 +106,7 @@ export class PostService {
                             tagId: tagObj ? tagObj.id : tag === '' ? undefined : 0
                         }
                     },
-                    deletedAt: null
+                    deletedAt: byAdmin ? undefined : null
                 }
             }),
             this._prismaService.post.findMany({
@@ -123,9 +119,9 @@ export class PostService {
                             tagId: tagObj ? tagObj.id : tag === '' ? undefined : 0
                         }
                     },
-                    deletedAt: null
+                    deletedAt: byAdmin ? undefined : null
                 },
-                orderBy: { updatedAt: Prisma.SortOrder.desc },
+                orderBy: byAdmin ? { createdAt: Prisma.SortOrder.desc } : { updatedAt: Prisma.SortOrder.desc },
                 select: byAdmin ? this._selectAdmin.select : this._select.select
             })
         ])
