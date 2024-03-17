@@ -63,14 +63,12 @@ model Post {
   id                String             @id @default(uuid())
   authorId          String?
   author            User?              @relation(fields: [authorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  parentId          String?
   title             String
   metaTitle         String?
   slug              String?
   summary           String?
   content           String
   thumbnail         String?
-  url               String?
   published         Boolean            @default(true)
 
   postTags          PostTag[]

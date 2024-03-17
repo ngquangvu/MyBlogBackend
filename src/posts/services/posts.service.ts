@@ -39,6 +39,37 @@ export class PostService {
         }
     }
 
+    private readonly _selectAdmin = {
+        select: {
+            id: true,
+            authorId: true,
+            parentId: true,
+            title: true,
+            metaTitle: true,
+            slug: true,
+            summary: true,
+            content: true,
+            thumbnail: true,
+            url: true,
+            published: true,
+            postTags: {
+                select: {
+                    tagId: true
+                }
+            },
+            postCategories: {
+                select: {
+                    categoryId: true
+                }
+            },
+            comments: true,
+
+            createdAt: true,
+            updatedAt: true,
+            deletedAt: true
+        }
+    }
+
     async findOne(id: string) {
         const post = await this._prismaService.post.findFirst({
             where: {
@@ -55,7 +86,7 @@ export class PostService {
         }
     }
 
-    async findAll(postPaginationQuery: PostPaginationQueryDto) {
+    async findAll(postPaginationQuery: PostPaginationQueryDto, byAdmin = false) {
         const { page = 1, limit = 10, search = undefined, cate = '', tag = '' } = postPaginationQuery
 
         const or = search
@@ -95,7 +126,7 @@ export class PostService {
                     deletedAt: null
                 },
                 orderBy: { updatedAt: Prisma.SortOrder.desc },
-                ...this._select
+                select: byAdmin ? this._selectAdmin.select : this._select.select
             })
         ])
 
@@ -134,6 +165,10 @@ export class PostService {
     }
 
     async delete(id: string) {
-        return this._prismaService.post.delete({ where: { id } })
+        return this._prismaService.post.update({ data: { deletedAt: new Date() }, where: { id } })
+    }
+
+    async restore(id: string) {
+        return this._prismaService.post.update({ data: { deletedAt: null }, where: { id } })
     }
 }

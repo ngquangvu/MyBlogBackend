@@ -1,18 +1,10 @@
-import { Controller, Get, Request, Post, Body, Bind, Param, Delete, UseGuards, Query } from '@nestjs/common'
+import { Controller, Get, Param, Query } from '@nestjs/common'
 import { PostService } from '../services'
-import { PostDto } from '../dtos'
-import { JwtAdminAuthGuard } from 'src/token/guards'
 import { PostPaginationQueryDto } from 'src/common/dtos/post-pagination-query.dto'
 
 @Controller('posts')
 export class PostsController {
     constructor(private readonly _postService: PostService) {}
-
-    @Post()
-    @Bind(Request())
-    async create(@Body() createPost: PostDto) {
-        return await this._postService.create(createPost)
-    }
 
     @Get()
     async findAll(@Query() postPaginationQuery: PostPaginationQueryDto) {
@@ -22,11 +14,5 @@ export class PostsController {
     @Get(':id')
     async findById(@Param('id') id: string) {
         return await this._postService.findOne(id)
-    }
-
-    @Delete(':id')
-    @UseGuards(JwtAdminAuthGuard)
-    async delete(@Param('id') id: string) {
-        return await this._postService.delete(id)
     }
 }
