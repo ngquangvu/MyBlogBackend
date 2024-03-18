@@ -27,28 +27,23 @@ async function truncate(prisma: PrismaClient) {
 const randomPositiveInteger = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1) + min)
 const randomArray = (min: number, max: number) => Array(Math.floor(Math.random() * (max - min + 1) + min))
 
-enum Role {
-    USER = 'USER',
-    AUTHOR = 'AUTHOR'
-}
-
 const categoryData = [
     {
         title: 'Cate 1',
         slug: 'slugc1',
-        image: 'cate1.svg',
+        image: 'nestjs_logo.svg',
         content: 'This is cate 1'
     },
     {
         title: 'Cate 2',
         slug: 'slugc2',
-        image: 'cate2.svg',
+        image: 'nestjs_logo.svg',
         content: 'This is cate 2'
     },
     {
         title: 'Cate 3',
         slug: 'slugc3',
-        image: 'cate3.svg',
+        image: 'nestjs_logo.svg',
         content: 'This is cate 3'
     }
 ]
@@ -57,19 +52,19 @@ const tagData = [
     {
         title: 'Tag 1',
         slug: 'slugt1',
-        image: 'tag1.svg',
+        image: 'nestjs_logo.svg',
         content: 'This is tag 1'
     },
     {
         title: 'Tag 2',
         slug: 'slugt2',
-        image: 'tag2.svg',
+        image: 'nestjs_logo.svg',
         content: 'This is tag 2'
     },
     {
         title: 'Tag 3',
         slug: 'slugt3',
-        image: 'tag3.svg',
+        image: 'nestjs_logo.svg',
         content: 'This is tag 3'
     }
 ]
@@ -129,7 +124,7 @@ const createUserPost = async (user: User): Promise<Post> => {
             slug: faker_en.company.buzzNoun(),
             summary: faker_en.lorem.paragraph(1),
             content: faker_en.lorem.paragraph(2),
-            thumbnail: faker_en.image.url(),
+            thumbnail: 'nestjs_logo.png',
             published: true
         }
     })

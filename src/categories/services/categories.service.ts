@@ -8,6 +8,7 @@ import { UpdateCategoryDto } from '../dtos/update-category.dto'
 @Injectable()
 export class CategoriesService {
     constructor(private readonly _prismaService: PrismaService) {}
+    private uploadedURL = process.env.UPLOADED_FILES_URL + '/'
 
     private readonly _select = {
         select: {
@@ -44,7 +45,7 @@ export class CategoriesService {
             },
             ...this._select
         })
-        return cate
+        return { ...cate, image: cate?.image ? this.uploadedURL + cate.image : null }
     }
 
     async findSlug(slug: string) {
@@ -54,7 +55,7 @@ export class CategoriesService {
             },
             ...this._select
         })
-        return cate
+        return { ...cate, image: cate?.image ? this.uploadedURL + cate.image : null }
     }
 
     async findAll(paginationQuery: PaginationQueryDto, byAdmin = false) {
@@ -88,7 +89,12 @@ export class CategoriesService {
         ])
 
         return {
-            data,
+            data: data.map((cate) => {
+                return {
+                    ...cate,
+                    image: cate?.image ? this.uploadedURL + cate.image : null
+                }
+            }),
             totalCount
         }
     }
@@ -99,7 +105,14 @@ export class CategoriesService {
             ...this._select
         })
 
-        return data
+        return {
+            ...data.map((cate) => {
+                return {
+                    ...cate,
+                    image: cate?.image ? this.uploadedURL + cate.image : null
+                }
+            })
+        }
     }
 
     async create(createData: CategoryDto) {

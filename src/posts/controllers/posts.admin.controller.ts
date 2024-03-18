@@ -11,10 +11,7 @@ import {
     Query,
     Patch,
     UploadedFile,
-    UseInterceptors,
-    FileTypeValidator,
-    MaxFileSizeValidator,
-    ParseFilePipe
+    UseInterceptors
 } from '@nestjs/common'
 import { PostService } from '../services'
 import { PostDto, UpdatePostDto } from '../dtos'
@@ -30,15 +27,20 @@ export class PostsAdminController {
 
     @Post()
     @Bind(Request())
-    @UseInterceptors(FileInterceptor('file', multerOptions))
-    async create(@Body() createPost: PostDto, @UploadedFile() file: Express.Multer.File) {
-        return await this._postService.create(createPost, file)
+    @UseInterceptors(FileInterceptor('thumbnailFile', multerOptions))
+    async create(@Body() createPost: PostDto, @UploadedFile() thumbnailFile: Express.Multer.File) {
+        return await this._postService.create(createPost, thumbnailFile)
     }
 
     @Patch(':id')
     @Bind(Request())
-    async updateAdmin(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-        return await this._postService.update(id, updatePostDto, true)
+    @UseInterceptors(FileInterceptor('thumbnailFile', multerOptions))
+    async updateAdmin(
+        @Param('id') id: string,
+        @Body() updatePostDto: UpdatePostDto,
+        @UploadedFile() thumbnailFile: Express.Multer.File
+    ) {
+        return await this._postService.update(id, updatePostDto, thumbnailFile, true)
     }
 
     @Get()

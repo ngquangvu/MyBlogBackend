@@ -9,10 +9,9 @@ import * as sharp from 'sharp'
 export const unlinkFile = async (filePath: string) => {
     try {
         if (!existsSync(filePath)) throw new InternalServerErrorException(`Can not delete ${filePath}`)
-
         await unlink(filePath)
     } catch {
-        throw Error(`Can not delete ${filePath} (2)`)
+        console.log(`Can not delete ${filePath} (2)`)
     }
 }
 export const compressImage = async (imagePath: string, imageSize: number) => {

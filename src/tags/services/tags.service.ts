@@ -8,6 +8,7 @@ import { UpdateTagDto } from '../dtos/update-tag.dto'
 @Injectable()
 export class TagsService {
     constructor(private readonly _prismaService: PrismaService) {}
+    private uploadedURL = process.env.UPLOADED_FILES_URL + '/'
 
     private readonly _select = {
         select: {
@@ -42,7 +43,7 @@ export class TagsService {
             },
             ...this._select
         })
-        return tag
+        return { ...tag, image: tag?.image ? this.uploadedURL + tag.image : null }
     }
 
     async findSlug(slug: string) {
@@ -52,7 +53,7 @@ export class TagsService {
             },
             ...this._select
         })
-        return tag
+        return { ...tag, image: tag?.image ? this.uploadedURL + tag.image : null }
     }
 
     async findAll(paginationQuery: PaginationQueryDto, byAdmin = false) {
@@ -86,7 +87,12 @@ export class TagsService {
         ])
 
         return {
-            data,
+            data: data.map((tag) => {
+                return {
+                    ...tag,
+                    image: tag?.image ? this.uploadedURL + tag.image : null
+                }
+            }),
             totalCount
         }
     }
@@ -97,7 +103,14 @@ export class TagsService {
             ...this._select
         })
 
-        return data
+        return {
+            ...data.map((tag) => {
+                return {
+                    ...tag,
+                    image: tag?.image ? this.uploadedURL + tag.image : null
+                }
+            })
+        }
     }
 
     async create(createData: TagDto) {

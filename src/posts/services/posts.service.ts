@@ -4,10 +4,12 @@ import { PostDto, UpdatePostDto } from '../dtos'
 import { Prisma } from '@prisma/client'
 import { PostPaginationQueryDto } from 'src/common/dtos/post-pagination-query.dto'
 import { TagsService } from 'src/tags/services'
+import { unlinkFile } from 'src/utils'
 
 @Injectable()
 export class PostService {
     constructor(private readonly _prismaService: PrismaService, private readonly _tagService: TagsService) {}
+    private uploadedURL = process.env.UPLOADED_FILES_URL + '/'
 
     private readonly _select = {
         select: {
@@ -78,7 +80,9 @@ export class PostService {
 
         return {
             ...post,
-            postTags: tags.filter((allTag) => post.postTags.find((postTag) => postTag.tagId === allTag.id))
+            thumbnail: post?.thumbnail ? this.uploadedURL + post.thumbnail : null,
+            postTags:
+                tags.length > 0 && tags.filter((allTag) => post.postTags.find((postTag) => postTag.tagId === allTag.id))
         }
     }
 
@@ -138,30 +142,38 @@ export class PostService {
             data: data.map((post) => {
                 return {
                     ...post,
-                    postTags: categories.filter((allTag) =>
-                        post.postTags.find((postTag) => postTag.tagId === allTag.id)
-                    )
+                    thumbnail: post?.thumbnail ? this.uploadedURL + post.thumbnail : null,
+                    postTags:
+                        categories.length > 0 &&
+                        categories.filter((allTag) => post.postTags.find((postTag) => postTag.tagId === allTag.id))
                 }
             }),
             totalCount
         }
     }
 
-    async create(createData: PostDto, file: Express.Multer.File, byAdmin = false) {
+    async create(createData: PostDto, thumbnailFile: Express.Multer.File, byAdmin = false) {
         return await this._prismaService.post.create({
             data: {
                 ...createData,
-                thumbnail: file.filename
+                thumbnail: thumbnailFile ? thumbnailFile.filename : createData.thumbnail
             },
             select: byAdmin ? this._selectAdmin.select : this._select.select
         })
     }
 
-    async update(id: string, updateData: UpdatePostDto, byAdmin = false) {
+    async update(id: string, updateData: UpdatePostDto, thumbnailFile: Express.Multer.File, byAdmin = false) {
+        if (thumbnailFile) {
+            const post = await this.findOne(id)
+            if (post && post.thumbnail) {
+                unlinkFile(process.env.UPLOADED_FILES_PATH + '/' + post.thumbnail)
+            }
+        }
         return await this._prismaService.post.update({
             where: { id },
             data: {
-                ...updateData
+                ...updateData,
+                thumbnail: thumbnailFile ? thumbnailFile.filename : updateData.thumbnail
             },
             select: byAdmin ? this._selectAdmin.select : this._select.select
         })

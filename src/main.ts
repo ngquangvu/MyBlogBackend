@@ -4,6 +4,8 @@ import { NestFactory, Reflector } from '@nestjs/core'
 import { AppModule } from './app'
 import * as cookieParser from 'cookie-parser'
 import { PrismaService } from './prisma/service'
+import * as express from 'express'
+import { NODE_ENV } from './app/constants'
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule)
@@ -33,6 +35,10 @@ async function bootstrap() {
         credentials: true
     })
     app.use(cookieParser())
+
+    if (configService.get<string>('NODE_ENV') === NODE_ENV.DEVELOPMENT) {
+        app.use('/media', express.static(`${configService.get<number>('UPLOADED_FILES_PATH')}`))
+    }
 
     await app.listen(PORT)
 }
