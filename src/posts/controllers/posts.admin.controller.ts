@@ -1,8 +1,27 @@
-import { Controller, Get, Request, Post, Body, Bind, Param, Delete, UseGuards, Query, Patch } from '@nestjs/common'
+import {
+    Controller,
+    Get,
+    Request,
+    Post,
+    Body,
+    Bind,
+    Param,
+    Delete,
+    UseGuards,
+    Query,
+    Patch,
+    UploadedFile,
+    UseInterceptors,
+    FileTypeValidator,
+    MaxFileSizeValidator,
+    ParseFilePipe
+} from '@nestjs/common'
 import { PostService } from '../services'
 import { PostDto, UpdatePostDto } from '../dtos'
 import { JwtAdminAuthGuard } from 'src/token/guards'
 import { PostPaginationQueryDto } from 'src/common/dtos/post-pagination-query.dto'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { multerOptions } from 'src/app/interceptors'
 
 @Controller('admin/posts')
 @UseGuards(JwtAdminAuthGuard)
@@ -11,8 +30,9 @@ export class PostsAdminController {
 
     @Post()
     @Bind(Request())
-    async create(@Body() createPost: PostDto) {
-        return await this._postService.create(createPost)
+    @UseInterceptors(FileInterceptor('file', multerOptions))
+    async create(@Body() createPost: PostDto, @UploadedFile() file: Express.Multer.File) {
+        return await this._postService.create(createPost, file)
     }
 
     @Patch(':id')

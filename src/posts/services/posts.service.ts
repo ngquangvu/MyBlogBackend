@@ -147,10 +147,11 @@ export class PostService {
         }
     }
 
-    async create(createData: PostDto, byAdmin = false) {
+    async create(createData: PostDto, file: Express.Multer.File, byAdmin = false) {
         return await this._prismaService.post.create({
             data: {
-                ...createData
+                ...createData,
+                thumbnail: file.filename
             },
             select: byAdmin ? this._selectAdmin.select : this._select.select
         })
