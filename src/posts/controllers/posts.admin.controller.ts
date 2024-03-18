@@ -1,6 +1,6 @@
 import { Controller, Get, Request, Post, Body, Bind, Param, Delete, UseGuards, Query, Patch } from '@nestjs/common'
 import { PostService } from '../services'
-import { PostDto } from '../dtos'
+import { PostDto, UpdatePostDto } from '../dtos'
 import { JwtAdminAuthGuard } from 'src/token/guards'
 import { PostPaginationQueryDto } from 'src/common/dtos/post-pagination-query.dto'
 
@@ -13,6 +13,12 @@ export class PostsAdminController {
     @Bind(Request())
     async create(@Body() createPost: PostDto) {
         return await this._postService.create(createPost)
+    }
+
+    @Patch(':id')
+    @Bind(Request())
+    async updateAdmin(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
+        return await this._postService.update(id, updatePostDto, true)
     }
 
     @Get()

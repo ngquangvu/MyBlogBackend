@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/service/prisma.service'
-import { PostDto } from '../dtos'
+import { PostDto, UpdatePostDto } from '../dtos'
 import { Prisma } from '@prisma/client'
 import { PostPaginationQueryDto } from 'src/common/dtos/post-pagination-query.dto'
 import { TagsService } from 'src/tags/services'
@@ -114,11 +114,17 @@ export class PostService {
                 take: limit,
                 where: {
                     ...or,
-                    postTags: {
-                        some: {
-                            tagId: tagObj ? tagObj.id : tag === '' ? undefined : 0
-                        }
-                    },
+                    postTags: byAdmin
+                        ? {
+                              every: {
+                                  tagId: undefined
+                              }
+                          }
+                        : {
+                              some: {
+                                  tagId: tagObj ? tagObj.id : tag === '' ? undefined : 0
+                              }
+                          },
                     deletedAt: byAdmin ? undefined : null
                 },
                 orderBy: byAdmin ? { createdAt: Prisma.SortOrder.desc } : { updatedAt: Prisma.SortOrder.desc },
@@ -141,22 +147,22 @@ export class PostService {
         }
     }
 
-    async create(createData: PostDto) {
+    async create(createData: PostDto, byAdmin = false) {
         return await this._prismaService.post.create({
             data: {
                 ...createData
             },
-            ...this._select
+            select: byAdmin ? this._selectAdmin.select : this._select.select
         })
     }
 
-    async update(updateData: PostDto, id: string) {
+    async update(id: string, updateData: UpdatePostDto, byAdmin = false) {
         return await this._prismaService.post.update({
             where: { id },
             data: {
                 ...updateData
             },
-            ...this._select
+            select: byAdmin ? this._selectAdmin.select : this._select.select
         })
     }
 

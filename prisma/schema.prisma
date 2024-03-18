@@ -164,5 +164,5 @@ model PostCategory {
 
 enum Role {
   USER
-  AUTHOR
+  ADMIN
 }

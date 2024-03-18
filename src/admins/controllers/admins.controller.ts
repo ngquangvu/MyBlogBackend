@@ -1,10 +1,11 @@
-import { Bind, Controller, Get, UseGuards, Request, Query, Patch, Param, Body, Delete, Post } from '@nestjs/common'
+import { Bind, Controller, Get, UseGuards, Request, Query, Patch, Param, Body, Delete, Post, Res } from '@nestjs/common'
 import { JwtAdminAuthGuard } from 'src/token/guards'
 
 import { AdminRequest } from '../types'
 import { AdminService } from '../services'
 import { CreateAdminDto, UpdateAdminDto } from '../dto'
 import { PaginationQueryDto } from 'src/common/dtos'
+import { AuthGuard } from '@nestjs/passport'
 
 @Controller('admin/admins')
 @UseGuards(JwtAdminAuthGuard)
@@ -21,6 +22,12 @@ export class AdminController {
     @Bind(Request())
     async getAdmins(@Query() adminPaginationQuery: PaginationQueryDto) {
         return await this._adminService.findMany(adminPaginationQuery)
+    }
+
+    @Get('/user')
+    @Bind(Request())
+    async getUserAdmin(@Request() req: any) {
+        return await this._adminService.findUserAdmin(req.user.email)
     }
 
     @Get(':id')
