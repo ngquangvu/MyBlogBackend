@@ -1,27 +1,70 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/service/prisma.service'
-import { PostDto } from '../dtos'
-import { PaginationQueryDto } from 'src/common/dtos'
+import { PostDto, UpdatePostDto } from '../dtos'
 import { Prisma } from '@prisma/client'
+import { PostPaginationQueryDto } from 'src/common/dtos/post-pagination-query.dto'
+import { TagsService } from 'src/tags/services'
+import { unlinkFile } from 'src/utils'
 
 @Injectable()
 export class PostService {
-    constructor(private readonly _prismaService: PrismaService) {}
+    constructor(private readonly _prismaService: PrismaService, private readonly _tagService: TagsService) {}
+    private uploadedURL = process.env.UPLOADED_FILES_URL + '/'
 
     private readonly _select = {
         select: {
+            id: true,
             authorId: true,
-            parentId: true,
             title: true,
             metaTitle: true,
             slug: true,
             summary: true,
             content: true,
             thumbnail: true,
-            url: true,
             published: true,
+            postTags: {
+                select: {
+                    tagId: true
+                }
+            },
+            postCategories: {
+                select: {
+                    categoryId: true
+                }
+            },
+            comments: true,
+
             createdAt: true,
             updatedAt: true
+        }
+    }
+
+    private readonly _selectAdmin = {
+        select: {
+            id: true,
+            authorId: true,
+            title: true,
+            metaTitle: true,
+            slug: true,
+            summary: true,
+            content: true,
+            thumbnail: true,
+            published: true,
+            postTags: {
+                select: {
+                    tagId: true
+                }
+            },
+            postCategories: {
+                select: {
+                    categoryId: true
+                }
+            },
+            comments: true,
+
+            createdAt: true,
+            updatedAt: true,
+            deletedAt: true
         }
     }
 
@@ -32,11 +75,19 @@ export class PostService {
             },
             ...this._select
         })
-        return post
+
+        const tags = await this._tagService.getAll()
+
+        return {
+            ...post,
+            thumbnail: post?.thumbnail ? this.uploadedURL + post.thumbnail : null,
+            postTags:
+                tags.length > 0 && tags.filter((allTag) => post.postTags.find((postTag) => postTag.tagId === allTag.id))
+        }
     }
 
-    async findAll(postPaginationQuery: PaginationQueryDto) {
-        const { page = 1, limit = 10, search = undefined } = postPaginationQuery
+    async findAll(postPaginationQuery: PostPaginationQueryDto, byAdmin = false) {
+        const { page = 1, limit = 10, search = undefined, cate = '', tag = '' } = postPaginationQuery
 
         const or = search
             ? {
@@ -48,11 +99,18 @@ export class PostService {
               }
             : {}
 
+        const tagObj = await this._tagService.findSlug(tag)
+
         const [totalCount, data] = await Promise.all([
             this._prismaService.post.count({
                 where: {
                     ...or,
-                    deletedAt: null
+                    postTags: {
+                        some: {
+                            tagId: tagObj ? tagObj.id : tag === '' ? undefined : 0
+                        }
+                    },
+                    deletedAt: byAdmin ? undefined : null
                 }
             }),
             this._prismaService.post.findMany({
@@ -60,39 +118,72 @@ export class PostService {
                 take: limit,
                 where: {
                     ...or,
-                    deletedAt: null
+                    postTags: byAdmin
+                        ? {
+                              every: {
+                                  tagId: undefined
+                              }
+                          }
+                        : {
+                              some: {
+                                  tagId: tagObj ? tagObj.id : tag === '' ? undefined : 0
+                              }
+                          },
+                    deletedAt: byAdmin ? undefined : null
                 },
-                orderBy: { updatedAt: Prisma.SortOrder.desc },
-                ...this._select
+                orderBy: byAdmin ? { createdAt: Prisma.SortOrder.desc } : { updatedAt: Prisma.SortOrder.desc },
+                select: byAdmin ? this._selectAdmin.select : this._select.select
             })
         ])
 
+        const categories = await this._tagService.getAll()
+
         return {
-            data,
+            data: data.map((post) => {
+                return {
+                    ...post,
+                    thumbnail: post?.thumbnail ? this.uploadedURL + post.thumbnail : null,
+                    postTags:
+                        categories.length > 0 &&
+                        categories.filter((allTag) => post.postTags.find((postTag) => postTag.tagId === allTag.id))
+                }
+            }),
             totalCount
         }
     }
 
-    async create(createData: PostDto) {
+    async create(createData: PostDto, thumbnailFile: Express.Multer.File, byAdmin = false) {
         return await this._prismaService.post.create({
             data: {
-                ...createData
+                ...createData,
+                thumbnail: thumbnailFile ? thumbnailFile.filename : createData.thumbnail
             },
-            ...this._select
+            select: byAdmin ? this._selectAdmin.select : this._select.select
         })
     }
 
-    async update(updateData: PostDto, id: string) {
+    async update(id: string, updateData: UpdatePostDto, thumbnailFile: Express.Multer.File, byAdmin = false) {
+        if (thumbnailFile) {
+            const post = await this.findOne(id)
+            if (post && post.thumbnail) {
+                unlinkFile(process.env.UPLOADED_FILES_PATH + '/' + post.thumbnail)
+            }
+        }
         return await this._prismaService.post.update({
             where: { id },
             data: {
-                ...updateData
+                ...updateData,
+                thumbnail: thumbnailFile ? thumbnailFile.filename : updateData.thumbnail
             },
-            ...this._select
+            select: byAdmin ? this._selectAdmin.select : this._select.select
         })
     }
 
     async delete(id: string) {
-        return this._prismaService.post.delete({ where: { id } })
+        return this._prismaService.post.update({ data: { deletedAt: new Date() }, where: { id } })
+    }
+
+    async restore(id: string) {
+        return this._prismaService.post.update({ data: { deletedAt: null }, where: { id } })
     }
 }

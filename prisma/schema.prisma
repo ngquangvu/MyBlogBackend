@@ -40,7 +40,6 @@ model Admin {
 
   token             Token?
 
-
   createdAt         DateTime          @default(now())       @map("created_at")
   updatedAt         DateTime?         @updatedAt            @map("updated_at")
   deletedAt         DateTime?         @map("deleted_at")
@@ -64,14 +63,12 @@ model Post {
   id                String             @id @default(uuid())
   authorId          String?
   author            User?              @relation(fields: [authorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  parentId          String?
   title             String
   metaTitle         String?
   slug              String?
   summary           String?
   content           String
   thumbnail         String?
-  url               String?
   published         Boolean            @default(true)
 
   postTags          PostTag[]
@@ -109,10 +106,15 @@ model Comment {
 model Tag {
   id                Int               @id @default(autoincrement())
   title             String
+  image             String?
   metaTitle         String?
   slug              String?
   content           String?
   postTags          PostTag[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@map("tags")
 }
@@ -122,10 +124,15 @@ model Category {
   id                Int               @id @default(autoincrement())
   parentId          String?
   title             String
+  image             String?
   metaTitle         String?
   slug              String?
   content           String?
-  postCategoris     PostCategory[]
+  postCategories     PostCategory[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   @@map("categories")
 }
@@ -157,5 +164,5 @@ model PostCategory {
 
 enum Role {
   USER
-  AUTHOR
+  ADMIN
 }

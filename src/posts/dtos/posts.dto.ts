@@ -7,10 +7,6 @@ export class PostDto implements Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'd
     readonly authorId: string
 
     @IsString()
-    @IsOptional()
-    readonly parentId: string
-
-    @IsString()
     @IsNotEmpty()
     readonly title: string
 
@@ -33,10 +29,6 @@ export class PostDto implements Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'd
     @IsString()
     @IsOptional()
     readonly thumbnail: string
-
-    @IsString()
-    @IsOptional()
-    readonly url: string
 
     @IsBoolean()
     @IsOptional()

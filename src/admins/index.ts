@@ -4,9 +4,10 @@ import { PrismaModule } from 'src/prisma'
 import { AdminController } from './controllers'
 import { AdminService } from './services'
 import { AuthenticationProvider } from 'src/authentication/providers'
+import { UserModule } from 'src/users'
 
 @Module({
-    imports: [PrismaModule, ConfigModule, AuthenticationProvider],
+    imports: [PrismaModule, ConfigModule, UserModule, AuthenticationProvider],
     providers: [AdminService],
     controllers: [AdminController],
     exports: [AdminService]

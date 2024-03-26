@@ -4,10 +4,12 @@ import { AdminResponseType, AdminsResponseType } from '../types'
 import { PaginationQueryDto } from 'src/common/dtos'
 import { CreateAdminDto, UpdateAdminDto } from '../dto'
 import { AuthenticationProvider } from 'src/authentication/providers'
+import { UserResponseType } from 'src/users/types'
+import { UserService } from 'src/users/services'
 
 @Injectable()
 export class AdminService {
-    constructor(private readonly _prismaService: PrismaService) {}
+    constructor(private readonly _prismaService: PrismaService, private readonly _userService: UserService) {}
 
     private readonly _select = {
         select: {
@@ -33,6 +35,15 @@ export class AdminService {
             throw new NotFoundException(`Admin not found`)
         }
         return admin
+    }
+
+    async findUserAdmin(email: string): Promise<UserResponseType> {
+        const userAdmin = await this._userService.findOneByEmail(email)
+
+        if (!userAdmin) {
+            throw new NotFoundException(`Admin user not found`)
+        }
+        return userAdmin
     }
 
     async findOneByEmail(email: string): Promise<AdminResponseType> {

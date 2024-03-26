@@ -1,4 +1,4 @@
-import { Admin, PrismaClient, User } from '@prisma/client'
+import { PrismaClient, Role } from '@prisma/client'
 import * as bcrypt from 'bcrypt'
 
 const prisma = new PrismaClient()
@@ -14,14 +14,20 @@ async function truncate(prisma: PrismaClient) {
     await prisma.$queryRaw`SET FOREIGN_KEY_CHECKS=1`
 }
 
-const createDefaultAdmin = async (): Promise<Admin> => {
-    return await prisma.admin.create({
-        data: {
-            firstName: 'admin',
-            lastName: '',
-            email: 'admin@mail.com',
-            password: await bcrypt.hash('admin', 10)
-        }
+const createDefaultAdmin = async () => {
+    const admin = {
+        firstName: 'admin',
+        lastName: '',
+        email: 'admin@mail.com',
+        password: await bcrypt.hash('admin', 10)
+    }
+
+    await prisma.user.create({
+        data: { ...admin, role: Role.ADMIN }
+    })
+
+    await prisma.admin.create({
+        data: admin
     })
 }
 
