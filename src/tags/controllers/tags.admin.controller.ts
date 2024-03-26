@@ -1,9 +1,25 @@
-import { Controller, Get, Request, Post, Body, Bind, Param, Delete, UseGuards, Query, Patch } from '@nestjs/common'
+import {
+    Controller,
+    Get,
+    Request,
+    Post,
+    Body,
+    Bind,
+    Param,
+    Delete,
+    UseGuards,
+    Query,
+    Patch,
+    UseInterceptors,
+    UploadedFile
+} from '@nestjs/common'
 import { PaginationQueryDto } from 'src/common/dtos'
 import { JwtAdminAuthGuard } from 'src/token/guards'
 import { TagsService } from '../services'
 import { TagDto } from '../dtos'
 import { UpdateTagDto } from '../dtos/update-tag.dto'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { multerOptions } from 'src/app/interceptors'
 
 @Controller('admin/tags')
 @UseGuards(JwtAdminAuthGuard)
@@ -18,8 +34,13 @@ export class TagsAdminController {
 
     @Patch(':id')
     @Bind(Request())
-    async updateAdmin(@Param('id') id: number, @Body() updateUserDto: UpdateTagDto) {
-        return await this._tagService.update(id, updateUserDto)
+    @UseInterceptors(FileInterceptor('image', multerOptions))
+    async updateAdmin(
+        @Param('id') id: number,
+        @Body() updateUserDto: UpdateTagDto,
+        @UploadedFile() image: Express.Multer.File
+    ) {
+        return await this._tagService.update(id, updateUserDto, image)
     }
 
     @Get()

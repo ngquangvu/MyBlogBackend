@@ -400,3 +400,5 @@ dist
 .serverless/**/*.zip
 
 /data/*
+
+/media/*

@@ -4,6 +4,7 @@ import { PaginationQueryDto } from 'src/common/dtos'
 import { Prisma } from '@prisma/client'
 import { TagDto } from '../dtos'
 import { UpdateTagDto } from '../dtos/update-tag.dto'
+import { getFileNameAndExtension, unlinkFile } from 'src/utils'
 
 @Injectable()
 export class TagsService {
@@ -122,13 +123,21 @@ export class TagsService {
         })
     }
 
-    async update(id: number, updateData: UpdateTagDto) {
+    async update(id: number, updateData: UpdateTagDto, imageFile: Express.Multer.File) {
+        if (imageFile) {
+            const tag = await this.findOne(id)
+            if (tag && tag.image) {
+                unlinkFile(process.env.UPLOADED_FILES_PATH + '/' + getFileNameAndExtension(tag.image))
+            }
+        }
+
         return await this._prismaService.tag.update({
             where: { id },
             data: {
-                ...updateData
+                ...updateData,
+                image: imageFile ? imageFile.filename : undefined
             },
-            ...this._select
+            ...this._selectAdmin
         })
     }
 
