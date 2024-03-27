@@ -114,10 +114,11 @@ export class TagsService {
         }
     }
 
-    async create(createData: TagDto) {
+    async create(createData: TagDto, imageFile: Express.Multer.File) {
         return await this._prismaService.tag.create({
             data: {
-                ...createData
+                ...createData,
+                image: imageFile ? imageFile.filename : undefined
             },
             ...this._select
         })

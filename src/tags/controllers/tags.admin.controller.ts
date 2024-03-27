@@ -28,8 +28,9 @@ export class TagsAdminController {
 
     @Post()
     @Bind(Request())
-    async create(@Body() createTag: TagDto) {
-        return await this._tagService.create(createTag)
+    @UseInterceptors(FileInterceptor('image', multerOptions))
+    async create(@Body() createTag: TagDto, @UploadedFile() image: Express.Multer.File) {
+        return await this._tagService.create(createTag, image)
     }
 
     @Patch(':id')
