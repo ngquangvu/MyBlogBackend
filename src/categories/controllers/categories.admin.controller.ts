@@ -1,9 +1,25 @@
-import { Controller, Get, Request, Post, Body, Bind, Param, Delete, UseGuards, Query, Patch } from '@nestjs/common'
+import {
+    Controller,
+    Get,
+    Request,
+    Post,
+    Body,
+    Bind,
+    Param,
+    Delete,
+    UseGuards,
+    Query,
+    Patch,
+    UploadedFile,
+    UseInterceptors
+} from '@nestjs/common'
 import { PaginationQueryDto } from 'src/common/dtos'
 import { JwtAdminAuthGuard } from 'src/token/guards'
 import { CategoriesService } from '../services'
 import { CategoryDto } from '../dtos'
 import { UpdateCategoryDto } from '../dtos/update-category.dto'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { multerOptions } from 'src/app/interceptors'
 
 @Controller('admin/categories')
 @UseGuards(JwtAdminAuthGuard)
@@ -12,14 +28,20 @@ export class CategoriesAdminController {
 
     @Post()
     @Bind(Request())
-    async create(@Body() createCate: CategoryDto) {
-        return await this._cateService.create(createCate)
+    @UseInterceptors(FileInterceptor('image', multerOptions))
+    async create(@Body() createCate: CategoryDto, @UploadedFile() image: Express.Multer.File) {
+        return await this._cateService.create(createCate, image)
     }
 
     @Patch(':id')
     @Bind(Request())
-    async updateAdmin(@Param('id') id: number, @Body() updateUserDto: UpdateCategoryDto) {
-        return await this._cateService.update(id, updateUserDto)
+    @UseInterceptors(FileInterceptor('image', multerOptions))
+    async updateAdmin(
+        @Param('id') id: number,
+        @Body() updateUserDto: UpdateCategoryDto,
+        @UploadedFile() image: Express.Multer.File
+    ) {
+        return await this._cateService.update(id, updateUserDto, image)
     }
 
     @Get()

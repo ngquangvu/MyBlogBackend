@@ -4,6 +4,7 @@ import { PaginationQueryDto } from 'src/common/dtos'
 import { Prisma } from '@prisma/client'
 import { CategoryDto } from '../dtos'
 import { UpdateCategoryDto } from '../dtos/update-category.dto'
+import { unlinkFile, getFileNameAndExtension } from 'src/utils'
 
 @Injectable()
 export class CategoriesService {
@@ -115,20 +116,29 @@ export class CategoriesService {
         }
     }
 
-    async create(createData: CategoryDto) {
+    async create(createData: CategoryDto, imageFile: Express.Multer.File) {
         return await this._prismaService.category.create({
             data: {
-                ...createData
+                ...createData,
+                image: imageFile ? imageFile.filename : undefined
             },
             ...this._select
         })
     }
 
-    async update(id: number, updateData: UpdateCategoryDto) {
+    async update(id: number, updateData: UpdateCategoryDto, imageFile: Express.Multer.File) {
+        if (imageFile) {
+            const category = await this.findOne(id)
+            if (category && category.image) {
+                unlinkFile(process.env.UPLOADED_FILES_PATH + '/' + getFileNameAndExtension(category.image))
+            }
+        }
+
         return await this._prismaService.category.update({
             where: { id },
             data: {
-                ...updateData
+                ...updateData,
+                image: imageFile ? imageFile.filename : undefined
             },
             ...this._select
         })
