@@ -156,7 +156,7 @@ export class PostService {
         return await this._prismaService.post.create({
             data: {
                 ...createData,
-                thumbnail: thumbnailFile ? thumbnailFile.filename : createData.thumbnail
+                thumbnail: thumbnailFile ? thumbnailFile.filename : undefined
             },
             select: byAdmin ? this._selectAdmin.select : this._select.select
         })
@@ -173,7 +173,7 @@ export class PostService {
             where: { id },
             data: {
                 ...updateData,
-                thumbnail: thumbnailFile ? thumbnailFile.filename : updateData.thumbnail
+                thumbnail: thumbnailFile ? thumbnailFile.filename : undefined
             },
             select: byAdmin ? this._selectAdmin.select : this._select.select
         })
