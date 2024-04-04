@@ -27,20 +27,20 @@ export class PostsAdminController {
 
     @Post()
     @Bind(Request())
-    @UseInterceptors(FileInterceptor('thumbnailFile', multerOptions))
-    async create(@Body() createPost: PostDto, @UploadedFile() thumbnailFile: Express.Multer.File) {
-        return await this._postService.create(createPost, thumbnailFile)
+    @UseInterceptors(FileInterceptor('thumbnail', multerOptions))
+    async create(@Body() createPost: PostDto, @UploadedFile() thumbnail: Express.Multer.File) {
+        return await this._postService.create(createPost, thumbnail)
     }
 
     @Patch(':id')
     @Bind(Request())
-    @UseInterceptors(FileInterceptor('thumbnailFile', multerOptions))
+    @UseInterceptors(FileInterceptor('thumbnail', multerOptions))
     async updateAdmin(
         @Param('id') id: string,
         @Body() updatePostDto: UpdatePostDto,
-        @UploadedFile() thumbnailFile: Express.Multer.File
+        @UploadedFile() thumbnail: Express.Multer.File
     ) {
-        return await this._postService.update(id, updatePostDto, thumbnailFile, true)
+        return await this._postService.update(id, updatePostDto, thumbnail, true)
     }
 
     @Get()

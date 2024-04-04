@@ -67,7 +67,7 @@ model Post {
   metaTitle         String?
   slug              String?
   summary           String?
-  content           String
+  content           String @db.Text
   thumbnail         String?
   published         Boolean            @default(true)
 
