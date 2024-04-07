@@ -27,7 +27,7 @@ export class AdminController {
     @Get('/user')
     @Bind(Request())
     async getUserAdmin(@Request() req: any) {
-        return await this._adminService.findUserAdmin(req.user.email)
+        return await this._adminService.findUserAdmin(req.email)
     }
 
     @Get(':id')
