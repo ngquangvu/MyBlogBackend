@@ -82,6 +82,24 @@ model Post {
   @@map("posts")
 }
 
+model Images {
+  id                String             @id @default(uuid())
+  authorId          String?
+  name              String
+  originalName      String?
+  sizeKb            Int
+  mimeType          String
+  sizeType          ImageSizeType
+  width             Int
+  height            Int
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@map("images")
+}
+
 
 model Comment {
   id                String            @id @default(uuid())
@@ -165,4 +183,11 @@ model PostCategory {
 enum Role {
   USER
   ADMIN
+}
+
+enum ImageSizeType {
+  EXTRA_LARGE
+  LARGE
+  MEDIUM
+  THUMBNAIL
 }
