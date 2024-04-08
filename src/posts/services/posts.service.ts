@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/service/prisma.service'
 import { PostDto, UpdatePostDto } from '../dtos'
-import { Prisma } from '@prisma/client'
+import { ImageSizeType, Prisma } from '@prisma/client'
 import { PostPaginationQueryDto } from 'src/common/dtos/post-pagination-query.dto'
 import { TagsService } from 'src/tags/services'
 import { unlinkFile } from 'src/utils'
@@ -176,6 +176,35 @@ export class PostService {
                 thumbnail: thumbnailFile ? thumbnailFile.filename : undefined
             },
             select: byAdmin ? this._selectAdmin.select : this._select.select
+        })
+    }
+
+    async uploadImage(author: { userId: string }, imageFile: Express.Multer.File) {
+        return await this._prismaService.images.create({
+            data: {
+                authorId: author.userId,
+                name: imageFile.filename,
+                originalName: imageFile.originalname,
+                sizeKb: Math.round(imageFile.size / Math.pow(2, 10)),
+                mimeType: imageFile.mimetype,
+                sizeType: ImageSizeType.LARGE,
+                width: 0,
+                height: 0
+            },
+            select: {
+                id: true,
+                authorId: true,
+                name: true,
+                originalName: true,
+                sizeKb: true,
+                mimeType: true,
+                sizeType: true,
+                width: true,
+                height: true,
+                createdAt: true,
+                updatedAt: true,
+                deletedAt: true
+            }
         })
     }
 

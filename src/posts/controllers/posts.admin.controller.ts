@@ -35,7 +35,7 @@ export class PostsAdminController {
     @Patch(':id')
     @Bind(Request())
     @UseInterceptors(FileInterceptor('thumbnail', multerOptions))
-    async updateAdmin(
+    async update(
         @Param('id') id: string,
         @Body() updatePostDto: UpdatePostDto,
         @UploadedFile() thumbnail: Express.Multer.File
@@ -51,6 +51,13 @@ export class PostsAdminController {
     @Get(':id')
     async findById(@Param('id') id: string) {
         return await this._postService.findOne(id)
+    }
+
+    @Post('/upload_image')
+    @Bind(Request())
+    @UseInterceptors(FileInterceptor('imageFile', multerOptions))
+    async uploadImage(@Body() author: { userId: string }, @UploadedFile() imageFile: Express.Multer.File) {
+        return await this._postService.uploadImage(author, imageFile)
     }
 
     @Delete(':id')
