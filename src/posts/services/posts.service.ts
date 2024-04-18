@@ -81,8 +81,7 @@ export class PostService {
         return {
             ...post,
             thumbnail: post?.thumbnail ? this.uploadedURL + post.thumbnail : null,
-            postTags:
-                tags.length > 0 && tags.filter((allTag) => post.postTags.find((postTag) => postTag.tagId === allTag.id))
+            postTags: post.postTags.map((postTag) => this.getTagById(tags, postTag.tagId))
         }
     }
 
@@ -100,16 +99,14 @@ export class PostService {
             : {}
 
         const tagObj = await this._tagService.findSlug(tag)
+        const tagId = tagObj ? tagObj.id : tag === '' ? null : 0
+        const postTagsCondition = tagId ? { some: { tagId: tagId } } : tagId === null ? {} : { some: { tagId: 0 } }
 
         const [totalCount, data] = await Promise.all([
             this._prismaService.post.count({
                 where: {
                     ...or,
-                    postTags: {
-                        some: {
-                            tagId: tagObj ? tagObj.id : tag === '' ? undefined : 0
-                        }
-                    },
+                    postTags: byAdmin ? { every: { tagId: undefined } } : postTagsCondition,
                     deletedAt: byAdmin ? undefined : null
                 }
             }),
@@ -118,17 +115,7 @@ export class PostService {
                 take: limit,
                 where: {
                     ...or,
-                    postTags: byAdmin
-                        ? {
-                              every: {
-                                  tagId: undefined
-                              }
-                          }
-                        : {
-                              some: {
-                                  tagId: tagObj ? tagObj.id : tag === '' ? undefined : 0
-                              }
-                          },
+                    postTags: byAdmin ? { every: { tagId: undefined } } : postTagsCondition,
                     deletedAt: byAdmin ? undefined : null
                 },
                 orderBy: byAdmin ? { createdAt: Prisma.SortOrder.desc } : { updatedAt: Prisma.SortOrder.desc },
@@ -136,16 +123,14 @@ export class PostService {
             })
         ])
 
-        const categories = await this._tagService.getAll()
+        const tags = await this._tagService.getAll()
 
         return {
             data: data.map((post) => {
                 return {
                     ...post,
                     thumbnail: post?.thumbnail ? this.uploadedURL + post.thumbnail : null,
-                    postTags:
-                        categories.length > 0 &&
-                        categories.filter((allTag) => post.postTags.find((postTag) => postTag.tagId === allTag.id))
+                    postTags: post.postTags.map((postTag) => this.getTagById(tags, postTag.tagId))
                 }
             }),
             totalCount
@@ -214,5 +199,14 @@ export class PostService {
 
     async restore(id: string) {
         return this._prismaService.post.update({ data: { deletedAt: null }, where: { id } })
+    }
+
+    getTagById(tags, tagId) {
+        for (const tag of tags) {
+            if (tag.id === tagId) {
+                return tag
+            }
+        }
+        return null
     }
 }

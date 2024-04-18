@@ -54,7 +54,7 @@ export class TagsService {
             },
             ...this._select
         })
-        return { ...tag, image: tag?.image ? this.uploadedURL + tag.image : null }
+        return tag ? (tag?.image ? { ...tag, image: this.uploadedURL + tag.image } : { ...tag }) : null
     }
 
     async findAll(paginationQuery: PaginationQueryDto, byAdmin = false) {
@@ -104,14 +104,14 @@ export class TagsService {
             ...this._select
         })
 
-        return {
+        return [
             ...data.map((tag) => {
                 return {
                     ...tag,
                     image: tag?.image ? this.uploadedURL + tag.image : null
                 }
             })
-        }
+        ]
     }
 
     async create(createData: TagDto, imageFile: Express.Multer.File) {
