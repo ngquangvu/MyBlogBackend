@@ -4,6 +4,7 @@ import { diskStorage } from 'multer'
 import path = require('path')
 // import { v4 as uuid } from 'uuid'
 import { HttpException, HttpStatus } from '@nestjs/common'
+import { getCurrentDateTimeLower } from 'src/utils'
 
 export const multerOptions = {
     limits: {
@@ -30,7 +31,7 @@ export const multerOptions = {
         // File modification details
         filename: (req: any, file: any, cb: any) => {
             const filename: string =
-                Date.now() + '-' + path.parse(file?.originalname)?.name?.replace(/[^a-zA-Z0-9]/g, '')
+                getCurrentDateTimeLower() + '_' + path.parse(file?.originalname)?.name?.replace(/[^a-zA-Z0-9]/g, '')
             const extension: string = path.parse(file?.originalname)?.ext
             cb(null, `${filename}${extension}`)
             // cb(null, `${uuid()}${extname(file.originalname)}`)
