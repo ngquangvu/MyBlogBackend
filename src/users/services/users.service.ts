@@ -47,7 +47,7 @@ export class UserService {
 
     async findOneByEmail(email: string) {
         return this._prismaService.user.findFirst({
-            where: { email: email },
+            where: { email: email ? email : '' },
             ...this._select
         })
     }
