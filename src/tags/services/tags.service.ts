@@ -93,14 +93,16 @@ export class TagsService {
         const [totalCount, data] = await Promise.all([
             this._prismaService.tag.count({
                 where: {
-                    ...or
+                    ...or,
+                    deletedAt: null
                 }
             }),
             this._prismaService.tag.findMany({
                 skip: (page - 1) * limit,
                 take: limit,
                 where: {
-                    ...or
+                    ...or,
+                    deletedAt: null
                 },
                 orderBy: { id: Prisma.SortOrder.desc },
                 select: byAdmin ? this._selectAdmin.select : this._select.select
@@ -124,6 +126,9 @@ export class TagsService {
      */
     async getAll() {
         const data = await this._prismaService.tag.findMany({
+            where: {
+                deletedAt: null
+            },
             orderBy: { id: Prisma.SortOrder.asc },
             ...this._select
         })
