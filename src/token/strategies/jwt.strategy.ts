@@ -17,6 +17,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         })
     }
 
+    /*
+     * Validate the user access token
+     * @param payload - The payload of the token
+     * @returns The user object if the token is valid
+     */
     async validate(payload: JwtPayload) {
         return await this._userService.findOneByEmail(payload.email)
     }

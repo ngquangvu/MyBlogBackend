@@ -10,6 +10,13 @@ export class UserAuthStrategy extends PassportStrategy(Strategy, 'user-auth') {
         super({ usernameField: 'email' })
     }
 
+    /*
+     * Validate the user credentials
+     * @param email - The email of the user
+     * @param password - The password of the user
+     * @returns The user object
+     * @throws UnauthorizedException if the user is not valid
+     */
     async validate(email: string, password: string) {
         const validateUser = await this._authenticationService.validateUser(email, password)
         if (!validateUser) {

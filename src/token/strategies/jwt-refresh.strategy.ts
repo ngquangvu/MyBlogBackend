@@ -20,6 +20,12 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
         })
     }
 
+    /*
+     * Validate the user refresh token
+     * @param request - The request object
+     * @param payload - The payload of the token
+     * @returns The user object if the token is valid
+     */
     async validate(request: Request, payload: JwtPayload) {
         if (!payload) {
             throw new BadRequestException('Invalid token')

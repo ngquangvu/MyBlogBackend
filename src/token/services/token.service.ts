@@ -16,6 +16,11 @@ export class TokenService {
         private readonly _configService: ConfigService
     ) {}
 
+    /*
+     * Create an access token
+     * @param payload - The payload for the token
+     * @returns The access token
+     */
     private async createAccessToken(payload: JwtPayload): Promise<string> {
         return this._jwtService.signAsync(payload, {
             secret: this._configService.get<string>('JWT_ACCESS_SECRET'),
@@ -25,6 +30,11 @@ export class TokenService {
         })
     }
 
+    /*
+     * Create a refresh token
+     * @param payload - The payload for the token
+     * @returns The refresh token
+     */
     private async createRefreshToken(payload: JwtPayload): Promise<string> {
         return this._jwtService.signAsync(payload, {
             secret: this._configService.get<string>('JWT_REFRESH_SECRET'),
@@ -34,6 +44,11 @@ export class TokenService {
         })
     }
 
+    /*
+     * Verify the token
+     * @param token - The token to verify
+     * @returns The payload of the token
+     */
     private async getCookieWithJwtAccessToken(
         authentication: AuthenticationResponseType
     ): Promise<AccessTokenForCookie> {
@@ -53,6 +68,11 @@ export class TokenService {
         }
     }
 
+    /*
+     * Verify the token
+     * @param token - The token to verify
+     * @returns The payload of the token
+     */
     private async getCookieWithJwtRefreshToken(
         authentication: AuthenticationResponseType
     ): Promise<RefreshTokenForCookie> {
@@ -72,6 +92,11 @@ export class TokenService {
         }
     }
 
+    /*
+     * Set the tokens to the header
+     * @param response - The response object
+     * @param authentication - The authentication object
+     */
     async setTokensToHeader(response: Response, authentication: AuthenticationResponseType): Promise<void> {
         const accessTokenCookie = await this.getCookieWithJwtAccessToken(authentication)
         const refreshTokenCookie = await this.getCookieWithJwtRefreshToken(authentication)
@@ -81,6 +106,11 @@ export class TokenService {
         response.cookie('refresh_token', refreshTokenCookie.refresh_token, { ...refreshTokenCookie.options, secure })
     }
 
+    /*
+     * Set the tokens to the header
+     * @param response - The response object
+     * @param authentication - The authentication object
+     */
     async logout(response: Response): Promise<void> {
         response.clearCookie('access_token')
         response.clearCookie('refresh_token')

@@ -11,6 +11,8 @@ import { ConfigService } from '@nestjs/config'
 export class UserService {
     constructor(private readonly _prismaService: PrismaService, private readonly _configService: ConfigService) {}
     private readonly _pageLimit = this._configService.get<number>('PAGINATION_LIMIT')
+
+    // Define the select fields for the user
     private readonly _select = {
         select: {
             id: true,
@@ -26,6 +28,7 @@ export class UserService {
         }
     }
 
+    // Define the select fields for the user for admin
     private readonly _selectAdmin = {
         select: {
             id: true,
@@ -45,6 +48,11 @@ export class UserService {
         }
     }
 
+    /*
+     * Find a single user by email
+     * @param email - The email of the user
+     * @returns The user object if found
+     */
     async findOneByEmail(email: string) {
         return this._prismaService.user.findFirst({
             where: { email: email ? email : '' },
@@ -52,6 +60,11 @@ export class UserService {
         })
     }
 
+    /*
+     * Find a single user by ID
+     * @param id - The ID of the user
+     * @returns The user object if found
+     */
     async findOne(id: string) {
         const user = await this._prismaService.user.findFirst({
             where: {
@@ -63,9 +76,16 @@ export class UserService {
         return user
     }
 
+    /*
+     * Find all users
+     * @param userPaginationQuery - The pagination query
+     * @param byAdmin - Whether the request is by an admin
+     * @returns The list of users
+     */
     async findAll(userPaginationQuery: PaginationQueryDto, byAdmin = false) {
         const { page = 1, limit = this._pageLimit, search = undefined } = userPaginationQuery
 
+        // Define the OR condition for the search
         const or = search
             ? {
                   OR: [
@@ -76,6 +96,7 @@ export class UserService {
               }
             : {}
 
+        // Get the total count of users and the list of users
         const [totalCount, data] = await Promise.all([
             this._prismaService.user.count({
                 where: {
@@ -99,6 +120,11 @@ export class UserService {
         }
     }
 
+    /*
+     * Register a new user
+     * @param registerUserDto - The registration data
+     * @returns The user object
+     */
     async userRegister(registerUserDto: RegisterUserDto) {
         const user = await this.findOneByEmail(registerUserDto.email)
         if (user) {
@@ -116,6 +142,12 @@ export class UserService {
         })
     }
 
+    /*
+     * Update a user
+     * @param id - The ID of the user
+     * @param updateUserDto - The data to update the user
+     * @returns The updated user object
+     */
     async update(id: string, updateUserDto: UpdateUserDto) {
         return this._prismaService.user.update({
             where: { id },
@@ -126,6 +158,11 @@ export class UserService {
         })
     }
 
+    /*
+     * Delete a user
+     * @param id - The ID of the user
+     * @returns The deleted user object
+     */
     async delete(id: string) {
         await this.findOne(id)
 
@@ -138,6 +175,11 @@ export class UserService {
         })
     }
 
+    /*
+     * Restore a user
+     * @param id - The ID of the user
+     * @returns The restored user object
+     */
     async restore(id: string) {
         return this._prismaService.user.update({
             data: {

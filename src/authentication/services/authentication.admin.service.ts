@@ -6,6 +6,13 @@ import { AuthenticationProvider } from '../providers'
 export class AuthAdminService {
     constructor(private readonly _prismaService: PrismaService) {}
 
+    /*
+     * Validate the admin credentials
+     * @param email - The email of the admin
+     * @param password - The password of the admin
+     * @returns True if the admin is valid
+     * @throws UnauthorizedException if the admin is not valid
+     */
     async validateAdmin(email: string, password: string): Promise<boolean> {
         const admin = await this._prismaService.admin.findFirst({
             where: { email, deletedAt: null }
