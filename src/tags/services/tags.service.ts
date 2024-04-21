@@ -133,14 +133,16 @@ export class TagsService {
             ...this._select
         })
 
-        return [
-            ...data.map((tag) => {
-                return {
-                    ...tag,
-                    image: tag?.image ? this.uploadedURL + tag.image : null
-                }
-            })
-        ]
+        return {
+            data: [
+                ...data.map((tag) => {
+                    return {
+                        ...tag,
+                        image: tag?.image ? this.uploadedURL + tag.image : null
+                    }
+                })
+            ]
+        }
     }
 
     /*

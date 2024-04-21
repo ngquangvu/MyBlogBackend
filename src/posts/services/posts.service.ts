@@ -91,7 +91,7 @@ export class PostService {
         return {
             ...post,
             thumbnail: post?.thumbnail ? this.uploadedURL + post.thumbnail : null,
-            postTags: post.postTags.map((postTag) => this.getTagById(tags, postTag.tagId))
+            postTags: post.postTags.map((postTag) => this.getTagById(tags.data, postTag.tagId))
         }
     }
 
@@ -148,7 +148,7 @@ export class PostService {
                 return {
                     ...post,
                     thumbnail: post?.thumbnail ? this.uploadedURL + post.thumbnail : null,
-                    postTags: post.postTags.map((postTag) => this.getTagById(tags, postTag.tagId))
+                    postTags: post.postTags.map((postTag) => this.getTagById(tags.data, postTag.tagId))
                 }
             }),
             totalCount
@@ -163,10 +163,25 @@ export class PostService {
      * @returns The created post
      */
     async create(createData: PostDto, thumbnailFile: Express.Multer.File, byAdmin = false) {
+        // Get the tag IDs array
+        const tagIds = createData.tagIds
+        const tagIdsArray = tagIds.split(',').map((tagId) => {
+            if (tagId && !isNaN(parseInt(tagId))) {
+                return { tagId: parseInt(tagId) }
+            }
+        })
+
+        // Remove the tagIds from the createData (not needed for creating the post)
+        delete createData.tagIds
+
+        // Create the post
         return await this._prismaService.post.create({
             data: {
                 ...createData,
-                thumbnail: thumbnailFile ? thumbnailFile.filename : undefined
+                thumbnail: thumbnailFile ? thumbnailFile.filename : undefined,
+                postTags: {
+                    create: tagIdsArray
+                }
             },
             select: byAdmin ? this._selectAdmin.select : this._select.select
         })
@@ -181,6 +196,14 @@ export class PostService {
      * @returns The updated post
      */
     async update(id: string, updateData: UpdatePostDto, thumbnailFile: Express.Multer.File, byAdmin = false) {
+        // Get the tag IDs array
+        const tagIds = updateData.tagIds
+        const tagIdsArray = tagIds.split(',').map((tagId) => {
+            if (tagId && !isNaN(parseInt(tagId))) {
+                return { tagId: parseInt(tagId) }
+            }
+        })
+
         // If the thumbnail file is provided, delete the old thumbnail file
         if (thumbnailFile) {
             const post = await this.findOne(id)
@@ -188,11 +211,24 @@ export class PostService {
                 unlinkFile(process.env.UPLOADED_FILES_PATH + '/' + post.thumbnail)
             }
         }
+
+        // Remove the tagIds from the updateData (not needed for creating the post)
+        delete updateData.tagIds
+
+        // Delete all post tags
+        await this._prismaService.postTag.deleteMany({
+            where: { postId: id }
+        })
+
+        // Update the post
         return await this._prismaService.post.update({
             where: { id },
             data: {
                 ...updateData,
-                thumbnail: thumbnailFile ? thumbnailFile.filename : undefined
+                thumbnail: thumbnailFile ? thumbnailFile.filename : undefined,
+                postTags: {
+                    create: tagIdsArray
+                }
             },
             select: byAdmin ? this._selectAdmin.select : this._select.select
         })

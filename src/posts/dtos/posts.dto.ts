@@ -1,5 +1,5 @@
 import { Post } from '@prisma/client'
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator'
 
 export class PostDto implements Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'> {
     @IsString()
@@ -17,6 +17,10 @@ export class PostDto implements Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'd
     @IsString()
     @IsOptional()
     readonly slug: string
+
+    @IsOptional()
+    @IsString()
+    tagIds?: string
 
     @IsString()
     @IsOptional()
