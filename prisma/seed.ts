@@ -134,7 +134,8 @@ const createUserPost = async (user: User): Promise<Post> => {
             summary: faker_en.lorem.paragraph(1),
             content: faker_en.lorem.paragraph(2),
             thumbnail: 'nestjs_logo.png',
-            published: true
+            published: true,
+            key: Math.random().toString(36).substring(2, 8)
         }
     })
 }

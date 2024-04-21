@@ -23,6 +23,7 @@ export class PostService {
             content: true,
             thumbnail: true,
             published: true,
+            key: true,
             postTags: {
                 select: {
                     tagId: true
@@ -52,6 +53,7 @@ export class PostService {
             content: true,
             thumbnail: true,
             published: true,
+            key: true,
             postTags: {
                 select: {
                     tagId: true
@@ -96,13 +98,48 @@ export class PostService {
     }
 
     /**
+     * Find a post by its title key
+     * @param id - The ID of the post
+     * @returns The found post
+     */
+    async findTitleKey(titleKey: string) {
+        // Get the key from title key (title-key) format which is the last part of the string
+        const key = titleKey.split('-').pop()
+
+        // Find the post by key
+        const post = await this._prismaService.post.findFirst({
+            where: {
+                key
+            },
+            ...this._select
+        })
+
+        // Get all tags
+        const tags = await this._tagService.getAll()
+
+        // Get all post tags
+        const postTags = post?.postTags
+            ? post?.postTags.map((postTag) => this.getTagById(tags.data, postTag.tagId))
+            : []
+
+        // Add additional data to the post
+        return post
+            ? {
+                  ...post,
+                  thumbnail: post?.thumbnail ? this.uploadedURL + post.thumbnail : null,
+                  postTags
+              }
+            : null
+    }
+
+    /**
      * Find all posts
      * @param postPaginationQuery - The query parameters for pagination
      * @param byAdmin - If the request is made by an admin
      * @returns The list of posts
      */
     async findAll(postPaginationQuery: PostPaginationQueryDto, byAdmin = false) {
-        const { page = 1, limit = 10, search = undefined, cate = '', tag = '' } = postPaginationQuery
+        const { page = 1, limit = 10, search = undefined, cate = '', tag = '', sort = '' } = postPaginationQuery
 
         const or = search
             ? {
@@ -135,7 +172,19 @@ export class PostService {
                     postTags: byAdmin ? { every: { tagId: undefined } } : postTagsCondition,
                     deletedAt: byAdmin ? undefined : null
                 },
-                orderBy: byAdmin ? { createdAt: Prisma.SortOrder.desc } : { updatedAt: Prisma.SortOrder.desc },
+                // Sort by latest, relevant, top
+                orderBy:
+                    sort === 'latest'
+                        ? { createdAt: Prisma.SortOrder.desc }
+                        : sort === 'relevant'
+                        ? {
+                              postTags: {
+                                  _count: Prisma.SortOrder.desc
+                              }
+                          }
+                        : sort === 'top'
+                        ? { content: Prisma.SortOrder.desc }
+                        : { updatedAt: Prisma.SortOrder.desc },
                 select: byAdmin ? this._selectAdmin.select : this._select.select
             })
         ])
@@ -174,6 +223,10 @@ export class PostService {
         // Remove the tagIds from the createData (not needed for creating the post)
         delete createData.tagIds
 
+        // Create random key length = 6 for the post
+        // Create random key length = 6 with alphanumeric characters for the post
+        const key = Math.random().toString(36).substring(2, 8)
+
         // Create the post
         return await this._prismaService.post.create({
             data: {
@@ -181,7 +234,8 @@ export class PostService {
                 thumbnail: thumbnailFile ? thumbnailFile.filename : undefined,
                 postTags: {
                     create: tagIdsArray
-                }
+                },
+                key
             },
             select: byAdmin ? this._selectAdmin.select : this._select.select
         })

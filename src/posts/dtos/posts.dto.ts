@@ -37,4 +37,8 @@ export class PostDto implements Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'd
     @IsBoolean()
     @IsOptional()
     readonly published: boolean
+
+    @IsString()
+    @IsOptional()
+    readonly key: string
 }

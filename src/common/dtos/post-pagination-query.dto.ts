@@ -13,4 +13,8 @@ export class PostPaginationQueryDto extends PaginationQueryDto {
     @IsOptional()
     @IsString()
     readonly authorId: string
+
+    @IsOptional()
+    @IsString()
+    readonly sort: string // sort by 'latest' or 'relevant' or 'top'
 }

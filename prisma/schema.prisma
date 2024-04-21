@@ -70,6 +70,7 @@ model Post {
   content           String @db.Text
   thumbnail         String?
   published         Boolean            @default(true)
+  key               String             @unique
 
   postTags          PostTag[]
   postCategories    PostCategory[]

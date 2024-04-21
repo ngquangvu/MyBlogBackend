@@ -15,4 +15,9 @@ export class PostsController {
     async findById(@Param('id') id: string) {
         return await this._postService.findOne(id)
     }
+
+    @Get('k/:titleKey')
+    async findByTitleKey(@Param('titleKey') titleKey: string) {
+        return await this._postService.findTitleKey(titleKey)
+    }
 }
