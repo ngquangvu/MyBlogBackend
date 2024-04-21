@@ -17,6 +17,11 @@ export class JwtAdminStrategy extends PassportStrategy(Strategy, 'jwt-admin') {
         })
     }
 
+    /*
+     * Validate the admin access token
+     * @param payload - The payload of the token
+     * @returns The admin object if the token is valid
+     */
     async validate(payload: JwtPayload) {
         return await this._adminService.findOneByEmail(payload.email)
     }

@@ -8,6 +8,7 @@ const prisma = new PrismaClient()
 
 // npx prisma db seed
 
+// Truncate the tables
 async function truncate(prisma: PrismaClient) {
     await prisma.$queryRaw`SET FOREIGN_KEY_CHECKS=0`
 
@@ -23,10 +24,13 @@ async function truncate(prisma: PrismaClient) {
 
     await prisma.$queryRaw`SET FOREIGN_KEY_CHECKS=1`
 }
-
+// Generate random positive integer
 const randomPositiveInteger = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1) + min)
+
+// Generate random array
 const randomArray = (min: number, max: number) => Array(Math.floor(Math.random() * (max - min + 1) + min))
 
+// Dummy data
 const categoryData = [
     {
         title: 'Cate 1',
@@ -69,6 +73,7 @@ const tagData = [
     }
 ]
 
+// Create the default admin
 const createDefaultAdmin = async (): Promise<Admin> => {
     return await prisma.admin.create({
         data: {
@@ -80,6 +85,7 @@ const createDefaultAdmin = async (): Promise<Admin> => {
     })
 }
 
+// Create categories
 const createCategories = async (): Promise<Category[]> => {
     const cates: Category[] = []
     categoryData.forEach(async (cateItem) => {
@@ -92,6 +98,7 @@ const createCategories = async (): Promise<Category[]> => {
     return cates
 }
 
+// Create tags
 const createTags = async (): Promise<Tag[]> => {
     const tags: Tag[] = []
     tagData.forEach(async (tagItem) => {
@@ -104,6 +111,7 @@ const createTags = async (): Promise<Tag[]> => {
     return tags
 }
 
+// Create a user
 const createUser = async (): Promise<User> => {
     return await prisma.user.create({
         data: {
@@ -115,6 +123,7 @@ const createUser = async (): Promise<User> => {
     })
 }
 
+// Create a post
 const createUserPost = async (user: User): Promise<Post> => {
     return await prisma.post.create({
         data: {
@@ -125,11 +134,13 @@ const createUserPost = async (user: User): Promise<Post> => {
             summary: faker_en.lorem.paragraph(1),
             content: faker_en.lorem.paragraph(2),
             thumbnail: 'nestjs_logo.png',
-            published: true
+            published: true,
+            key: Math.random().toString(36).substring(2, 8)
         }
     })
 }
 
+// Create a post category
 const createPostCate = async (post: Post, cateId: number) => {
     await prisma.postCategory.create({
         data: {
@@ -139,6 +150,7 @@ const createPostCate = async (post: Post, cateId: number) => {
     })
 }
 
+// Create a post tag
 const createPostTag = async (post: Post, tagId: number) => {
     await prisma.postTag.create({
         data: {
@@ -148,11 +160,13 @@ const createPostTag = async (post: Post, tagId: number) => {
     })
 }
 
+// Create categories and tags
 const createCateTag = async () => {
     await createCategories()
     await createTags()
 }
 
+// Main function
 async function main() {
     await truncate(prisma)
 
@@ -160,6 +174,7 @@ async function main() {
 
     const users: User[] = []
 
+    // Create categories, tags, users, posts, post categories, and post tags
     await createCateTag().then(async () => {
         for (const _ of randomArray(10, 10)) {
             const user = await createUser()
@@ -181,6 +196,8 @@ async function main() {
         }
     })
 }
+
+// Run the main function
 main()
     .then(async () => {
         await prisma.$disconnect()

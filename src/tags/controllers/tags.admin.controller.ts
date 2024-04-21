@@ -49,6 +49,11 @@ export class TagsAdminController {
         return await this._tagService.findAll(tagPaginationQuery, true)
     }
 
+    @Get('/all')
+    async getAll() {
+        return await this._tagService.getAll()
+    }
+
     @Get(':id')
     async findById(@Param('id') id: number) {
         return await this._tagService.findOne(id)

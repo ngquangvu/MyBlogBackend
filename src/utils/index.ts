@@ -19,6 +19,11 @@ export const getCurrentDateTimeLower = () => {
     return `${year}${month}${day}${hours}${minutes}${seconds}`
 }
 
+/*
+ * Delete file
+ * @param filePath: string
+ * @returns void if can not delete file
+ */
 export const unlinkFile = async (filePath: string) => {
     try {
         if (!existsSync(filePath)) throw new InternalServerErrorException(`Can not delete ${filePath}`)
@@ -28,6 +33,12 @@ export const unlinkFile = async (filePath: string) => {
     }
 }
 
+/*
+ * Compress image
+ * @param imagePath: string
+ * @param imageSize: number
+ * @returns void if can not compress images
+ */
 export const compressImage = async (imagePath: string, imageSize: number) => {
     await readFileAsync(imagePath)
         .then(async (buffer: Buffer) => {
@@ -39,6 +50,11 @@ export const compressImage = async (imagePath: string, imageSize: number) => {
         })
 }
 
+/*
+ * Get file name and extension
+ * @param url: string
+ * @returns string | null
+ */
 export const getFileNameAndExtension = (url: string | undefined): string | null => {
     const match = url ? url.match(/\/([^\/?#]+)\.([a-z0-9]+)(?:[?#]|$)/i) : ''
     if (match && match.length === 3) {

@@ -19,6 +19,12 @@ export class JwtAdminRefreshStrategy extends PassportStrategy(Strategy, 'jwt-adm
         })
     }
 
+    /*
+     * Validate the admin refresh token
+     * @param request - The request object
+     * @param payload - The payload of the token
+     * @returns The admin object if the token is valid
+     */
     async validate(request: Request, payload: JwtPayload) {
         const refreshToken = request.cookies.admin_refresh_token
 

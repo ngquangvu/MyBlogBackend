@@ -11,6 +11,13 @@ export class AdminAuthStrategy extends PassportStrategy(Strategy, 'admin-auth') 
         super({ usernameField: 'email' })
     }
 
+    /*
+     * Validate the admin credentials
+     * @param email - The email of the admin
+     * @param password - The password of the admin
+     * @returns The admin response type
+     * @throws UnauthorizedException if the admin is not valid
+     */
     async validate(email: string, password: string): Promise<AdminResponseType> {
         const validatedAdmin = await this._authAdminService.validateAdmin(email, password)
         if (!validatedAdmin) {

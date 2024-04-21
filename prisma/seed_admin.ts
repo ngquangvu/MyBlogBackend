@@ -5,6 +5,7 @@ const prisma = new PrismaClient()
 
 // npx prisma db seed
 
+// Truncate the tables
 async function truncate(prisma: PrismaClient) {
     await prisma.$queryRaw`SET FOREIGN_KEY_CHECKS=0`
 
@@ -14,6 +15,7 @@ async function truncate(prisma: PrismaClient) {
     await prisma.$queryRaw`SET FOREIGN_KEY_CHECKS=1`
 }
 
+// Create the default admin
 const createDefaultAdmin = async () => {
     const admin = {
         firstName: 'admin',
@@ -31,11 +33,14 @@ const createDefaultAdmin = async () => {
     })
 }
 
+// Main function
 async function main() {
     await truncate(prisma)
 
     await createDefaultAdmin()
 }
+
+// Run the main function
 main()
     .then(async () => {
         await prisma.$disconnect()
