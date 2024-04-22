@@ -15,4 +15,9 @@ export class CategoriesController {
     async findById(@Param('id') id: number) {
         return await this._cateService.findOne(id)
     }
+
+    @Get('/s/:slug')
+    async findBySlug(@Param('slug') slug: string) {
+        return await this._cateService.findSlug(slug)
+    }
 }

@@ -53,7 +53,7 @@ export class CategoriesService {
             },
             ...this._select
         })
-        return { ...cate, image: cate?.image ? this.uploadedURL + cate.image : null }
+        return cate ? (cate?.image ? { ...cate, image: this.uploadedURL + cate.image } : { ...cate }) : null
     }
 
     /*
@@ -102,7 +102,8 @@ export class CategoriesService {
                 skip: (page - 1) * limit,
                 take: limit,
                 where: {
-                    ...or
+                    ...or,
+                    deletedAt: null
                 },
                 orderBy: { id: Prisma.SortOrder.desc },
                 select: byAdmin ? this._selectAdmin.select : this._select.select
