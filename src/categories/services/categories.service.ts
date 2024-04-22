@@ -126,17 +126,22 @@ export class CategoriesService {
      */
     async getAll() {
         const data = await this._prismaService.category.findMany({
+            where: {
+                deletedAt: null
+            },
             orderBy: { id: Prisma.SortOrder.asc },
             ...this._select
         })
 
         return {
-            ...data.map((cate) => {
-                return {
-                    ...cate,
-                    image: cate?.image ? this.uploadedURL + cate.image : null
-                }
-            })
+            data: [
+                ...data.map((cate) => {
+                    return {
+                        ...cate,
+                        image: cate?.image ? this.uploadedURL + cate.image : null
+                    }
+                })
+            ]
         }
     }
 

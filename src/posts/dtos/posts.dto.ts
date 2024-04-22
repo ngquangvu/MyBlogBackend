@@ -22,6 +22,10 @@ export class PostDto implements Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'd
     @IsString()
     tagIds?: string
 
+    @IsOptional()
+    @IsString()
+    cateIds?: string
+
     @IsString()
     @IsOptional()
     readonly summary: string

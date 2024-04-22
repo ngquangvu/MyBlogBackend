@@ -49,6 +49,11 @@ export class CategoriesAdminController {
         return await this._cateService.findAll(catePaginationQuery, true)
     }
 
+    @Get('/all')
+    async getAll() {
+        return await this._cateService.getAll()
+    }
+
     @Get(':id')
     async findById(@Param('id') id: number) {
         return await this._cateService.findOne(id)

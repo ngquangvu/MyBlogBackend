@@ -5,10 +5,15 @@ import { ImageSizeType, Prisma } from '@prisma/client'
 import { PostPaginationQueryDto } from 'src/common/dtos/post-pagination-query.dto'
 import { TagsService } from 'src/tags/services'
 import { unlinkFile } from 'src/utils'
+import { CategoriesService } from 'src/categories/services'
 
 @Injectable()
 export class PostService {
-    constructor(private readonly _prismaService: PrismaService, private readonly _tagService: TagsService) {}
+    constructor(
+        private readonly _prismaService: PrismaService,
+        private readonly _tagService: TagsService,
+        private readonly _cateService: CategoriesService
+    ) {}
     private uploadedURL = process.env.UPLOADED_FILES_URL + '/'
 
     // Define the select fields for the post
@@ -89,11 +94,15 @@ export class PostService {
         // Get all tags
         const tags = await this._tagService.getAll()
 
+        // Get all categories
+        const cates = await this._cateService.getAll()
+
         // Add additional data to the post
         return {
             ...post,
             thumbnail: post?.thumbnail ? this.uploadedURL + post.thumbnail : null,
-            postTags: post.postTags.map((postTag) => this.getTagById(tags.data, postTag.tagId))
+            postTags: post.postTags.map((postTag) => this.getTagById(tags.data, postTag.tagId)),
+            postCategories: post.postCategories.map((postCate) => this.getCateById(cates.data, postCate.categoryId))
         }
     }
 
@@ -151,9 +160,19 @@ export class PostService {
               }
             : {}
 
+        // Get the tag ID
         const tagObj = await this._tagService.findSlug(tag)
         const tagId = tagObj ? tagObj.id : tag === '' ? null : 0
         const postTagsCondition = tagId ? { some: { tagId: tagId } } : tagId === null ? {} : { some: { tagId: 0 } }
+
+        // Get the category ID
+        const cateObj = await this._cateService.findSlug(cate)
+        const cateId = cateObj ? cateObj.id : cate === '' ? null : 0
+        const postCatesCondition = cateId
+            ? { some: { categoryId: cateId } }
+            : cateId === null
+            ? {}
+            : { some: { categoryId: 0 } }
 
         // Get the total count of posts and the list of posts
         const [totalCount, data] = await Promise.all([
@@ -161,6 +180,7 @@ export class PostService {
                 where: {
                     ...or,
                     postTags: byAdmin ? { every: { tagId: undefined } } : postTagsCondition,
+                    postCategories: byAdmin ? { every: { categoryId: undefined } } : postCatesCondition,
                     deletedAt: byAdmin ? undefined : null
                 }
             }),
@@ -170,6 +190,7 @@ export class PostService {
                 where: {
                     ...or,
                     postTags: byAdmin ? { every: { tagId: undefined } } : postTagsCondition,
+                    postCategories: byAdmin ? { every: { categoryId: undefined } } : postCatesCondition,
                     deletedAt: byAdmin ? undefined : null
                 },
                 // Sort by latest, relevant, top
@@ -220,10 +241,19 @@ export class PostService {
             }
         })
 
+        // Get the category IDs array
+        const cateIds = createData.cateIds
+        const cateIdsArray = cateIds.split(',').map((cateId) => {
+            if (cateId && !isNaN(parseInt(cateId))) {
+                return { categoryId: parseInt(cateId) }
+            }
+        })
+
         // Remove the tagIds from the createData (not needed for creating the post)
         delete createData.tagIds
+        // Remove the cateIds from the createData (not needed for creating the post)
+        delete createData.cateIds
 
-        // Create random key length = 6 for the post
         // Create random key length = 6 with alphanumeric characters for the post
         const key = Math.random().toString(36).substring(2, 8)
 
@@ -234,6 +264,9 @@ export class PostService {
                 thumbnail: thumbnailFile ? thumbnailFile.filename : undefined,
                 postTags: {
                     create: tagIdsArray
+                },
+                postCategories: {
+                    create: cateIdsArray
                 },
                 key
             },
@@ -258,6 +291,14 @@ export class PostService {
             }
         })
 
+        // Get the category IDs array
+        const cateIds = updateData.cateIds
+        const cateIdsArray = cateIds.split(',').map((cateId) => {
+            if (cateId && !isNaN(parseInt(cateId))) {
+                return { categoryId: parseInt(cateId) }
+            }
+        })
+
         // If the thumbnail file is provided, delete the old thumbnail file
         if (thumbnailFile) {
             const post = await this.findOne(id)
@@ -268,11 +309,22 @@ export class PostService {
 
         // Remove the tagIds from the updateData (not needed for creating the post)
         delete updateData.tagIds
+        // Remove the cateIds from the updateData (not needed for creating the post)
+        delete updateData.cateIds
 
-        // Delete all post tags
-        await this._prismaService.postTag.deleteMany({
-            where: { postId: id }
-        })
+        // If tags is not null, delete all post tags
+        if (tagIds) {
+            await this._prismaService.postTag.deleteMany({
+                where: { postId: id }
+            })
+        }
+
+        // If cates is not null, delete all post cates
+        if (cateIds) {
+            await this._prismaService.postCategory.deleteMany({
+                where: { postId: id }
+            })
+        }
 
         // Update the post
         return await this._prismaService.post.update({
@@ -282,6 +334,9 @@ export class PostService {
                 thumbnail: thumbnailFile ? thumbnailFile.filename : undefined,
                 postTags: {
                     create: tagIdsArray
+                },
+                postCategories: {
+                    create: cateIdsArray
                 }
             },
             select: byAdmin ? this._selectAdmin.select : this._select.select
@@ -365,10 +420,25 @@ export class PostService {
      * @param tagId - The ID of the tag
      * @returns The found tag
      */
-    getTagById(tags, tagId) {
+    private getTagById(tags, tagId) {
         for (const tag of tags) {
             if (tag.id === tagId) {
                 return tag
+            }
+        }
+        return null
+    }
+
+    /**
+     * Get a cate by its ID
+     * @param cates - The list of cates
+     * @param cateId - The ID of the cate
+     * @returns The found cate
+     */
+    private getCateById(cates, cateId) {
+        for (const cate of cates) {
+            if (cate.id === cateId) {
+                return cate
             }
         }
         return null
