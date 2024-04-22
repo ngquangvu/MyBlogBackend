@@ -213,12 +213,18 @@ export class PostService {
         // Get all tags
         const tags = await this._tagService.getAll()
 
+        // Get all categories
+        const cates = await this._cateService.getAll()
+
         return {
             data: data.map((post) => {
                 return {
                     ...post,
                     thumbnail: post?.thumbnail ? this.uploadedURL + post.thumbnail : null,
-                    postTags: post.postTags.map((postTag) => this.getTagById(tags.data, postTag.tagId))
+                    postTags: post.postTags.map((postTag) => this.getTagById(tags.data, postTag.tagId)),
+                    postCategories: post.postCategories.map((postCate) =>
+                        this.getCateById(cates.data, postCate.categoryId)
+                    )
                 }
             }),
             totalCount

@@ -68,7 +68,7 @@ export class CategoriesService {
             },
             ...this._select
         })
-        return { ...cate, image: cate?.image ? this.uploadedURL + cate.image : null }
+        return cate ? (cate?.image ? { ...cate, image: this.uploadedURL + cate.image } : { ...cate }) : null
     }
 
     /*
