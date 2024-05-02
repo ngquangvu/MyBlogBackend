@@ -16,5 +16,5 @@ export class PostPaginationQueryDto extends PaginationQueryDto {
 
     @IsOptional()
     @IsString()
-    readonly sort: string // sort by 'latest' or 'relevant' or 'top'
+    readonly sort: string // sort by 'recent' or 'relevant' or 'top'
 }
