@@ -101,8 +101,10 @@ export class PostService {
         return {
             ...post,
             thumbnail: post?.thumbnail ? this.uploadedURL + post.thumbnail : null,
-            postTags: post.postTags.map((postTag) => this.getTagById(tags.data, postTag.tagId)),
-            postCategories: post.postCategories.map((postCate) => this.getCateById(cates.data, postCate.categoryId))
+            postTags: post?.postTags ? post.postTags.map((postTag) => this.getTagById(tags.data, postTag.tagId)) : [],
+            postCategories: post?.postCategories
+                ? post.postCategories.map((postCate) => this.getCateById(cates.data, postCate.categoryId))
+                : []
         }
     }
 
@@ -193,9 +195,9 @@ export class PostService {
                     postCategories: byAdmin ? { every: { categoryId: undefined } } : postCatesCondition,
                     deletedAt: byAdmin ? undefined : null
                 },
-                // Sort by latest, relevant, top
+                // Sort by recent, relevant, top
                 orderBy:
-                    sort === 'latest'
+                    sort === 'recent'
                         ? { createdAt: Prisma.SortOrder.desc }
                         : sort === 'relevant'
                         ? {
