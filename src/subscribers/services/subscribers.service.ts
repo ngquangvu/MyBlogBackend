@@ -3,6 +3,8 @@ import { PrismaService } from 'src/prisma/service/prisma.service'
 import { PaginationQueryDto } from 'src/common/dtos'
 import { Prisma } from '@prisma/client'
 import { SubscriberDto, UpdateSubscriberDto } from '../dtos'
+import { SubscriberUserDto } from '../dtos/subscribers.user.dto'
+import { Types } from 'src/common/types'
 
 @Injectable()
 export class SubscribersService {
@@ -11,6 +13,12 @@ export class SubscribersService {
     // Define the select fields for the subscriber
 
     private readonly _select = {
+        select: {
+            email: true
+        }
+    }
+
+    private readonly _selectAdmin = {
         select: {
             id: true,
             email: true,
@@ -33,7 +41,7 @@ export class SubscribersService {
             where: {
                 id
             },
-            ...this._select
+            ...this._selectAdmin
         })
         return subscriber
     }
@@ -66,8 +74,8 @@ export class SubscribersService {
                 where: {
                     ...or
                 },
-                orderBy: { id: Prisma.SortOrder.desc },
-                select: this._select.select
+                orderBy: { createdAt: Prisma.SortOrder.desc },
+                select: this._selectAdmin.select
             })
         ])
 
@@ -88,7 +96,7 @@ export class SubscribersService {
             data: {
                 ...createData
             },
-            ...this._select
+            ...this._selectAdmin
         })
     }
 
@@ -105,6 +113,32 @@ export class SubscribersService {
             data: {
                 ...updateData
             },
+            ...this._selectAdmin
+        })
+    }
+
+    /*
+     * User subscribe to the newsletter
+     * @param createData - The data for creating the subscriber
+     * @returns The created subscriber
+     *  object
+     */
+    async subscribe(createData: SubscriberUserDto) {
+        // Check if the email is already subscribed
+        const subscriber = await this._prismaService.subscriber.findFirst({
+            where: {
+                email: createData.email
+            }
+        })
+
+        // If the subscriber is already subscribed, update the subscriber
+        if (subscriber) {
+            return null
+        }
+        return await this._prismaService.subscriber.create({
+            data: {
+                ...createData
+            },
             ...this._select
         })
     }
@@ -120,7 +154,7 @@ export class SubscribersService {
             data: {
                 isAgree: false
             },
-            ...this._select
+            ...this._selectAdmin
         })
     }
 

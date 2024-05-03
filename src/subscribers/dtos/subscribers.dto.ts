@@ -1,8 +1,8 @@
 import { Subscriber } from '@prisma/client'
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import { IsBoolean, IsNotEmpty, IsOptional, IsEmail } from 'class-validator'
 
 export class SubscriberDto implements Omit<Subscriber, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'> {
-    @IsString()
+    @IsEmail()
     @IsNotEmpty()
     readonly email: string
 

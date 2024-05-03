@@ -1,14 +1,14 @@
 import { Controller, Request, Post, Body, Bind, Param, Patch } from '@nestjs/common'
 import { SubscribersService } from '../services'
-import { SubscriberDto } from '../dtos'
+import { SubscriberUserDto } from '../dtos/subscribers.user.dto'
 
 @Controller('subscribers')
 export class SubscribersController {
     constructor(private readonly _subscriberService: SubscribersService) {}
     @Post()
     @Bind(Request())
-    async create(@Body() createSubscriber: SubscriberDto) {
-        return await this._subscriberService.create(createSubscriber)
+    async create(@Body() createSubscriber: SubscriberUserDto) {
+        return await this._subscriberService.subscribe(createSubscriber)
     }
 
     @Patch('unSubscribe/:email')
