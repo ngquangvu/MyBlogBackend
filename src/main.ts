@@ -40,6 +40,13 @@ async function bootstrap() {
         app.use('/media', express.static(`${configService.get<number>('UPLOADED_FILES_PATH')}`))
     }
 
-    await app.listen(PORT)
+    const httpsOptions = {
+        key: fs.readFileSync('path/to/private/key.pem'),
+        cert: fs.readFileSync('path/to/certificate.pem'),
+    };
+
+    const httpServer = await app.listen(PORT);
+    const httpsServer = await app.listen(443, httpsOptions);
+
 }
 bootstrap()
