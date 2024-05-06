@@ -14,7 +14,7 @@ async function bootstrap() {
     const PORT = +configService.get<number>('PORT')
 
     const prismaService = app.get(PrismaService)
-    app.setGlobalPrefix('/api')
+    app.setGlobalPrefix(configService.get<string>('API_PREFIX'))
     await prismaService.enableShutdownHooks(app)
 
     app.useGlobalPipes(
