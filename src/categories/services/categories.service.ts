@@ -95,7 +95,8 @@ export class CategoriesService {
         const [totalCount, data] = await Promise.all([
             this._prismaService.category.count({
                 where: {
-                    ...or
+                    ...or,
+                    postCategories: byAdmin ? { every: { categoryId: undefined } } : { some: { categoryId: undefined } }
                 }
             }),
             this._prismaService.category.findMany({
@@ -103,6 +104,9 @@ export class CategoriesService {
                 take: limit,
                 where: {
                     ...or,
+                    postCategories: byAdmin
+                        ? { every: { categoryId: undefined } }
+                        : { some: { categoryId: undefined } },
                     deletedAt: null
                 },
                 orderBy: { id: Prisma.SortOrder.desc },

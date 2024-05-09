@@ -94,6 +94,7 @@ export class TagsService {
             this._prismaService.tag.count({
                 where: {
                     ...or,
+                    postTags: byAdmin ? { every: { tagId: undefined } } : { some: { tagId: undefined } },
                     deletedAt: null
                 }
             }),
@@ -102,6 +103,7 @@ export class TagsService {
                 take: limit,
                 where: {
                     ...or,
+                    postTags: byAdmin ? { every: { tagId: undefined } } : { some: { tagId: undefined } },
                     deletedAt: null
                 },
                 orderBy: { id: Prisma.SortOrder.desc },
