@@ -207,7 +207,7 @@ export class PostService {
                           }
                         : sort === 'top'
                         ? { content: Prisma.SortOrder.desc }
-                        : { updatedAt: Prisma.SortOrder.desc },
+                        : { createdAt: Prisma.SortOrder.desc },
                 select: byAdmin ? this._selectAdmin.select : this._select.select
             })
         ])
